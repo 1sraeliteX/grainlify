@@ -299,6 +299,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -377,6 +383,12 @@
                               "val": {
                                 "string": "prog-b"
                               }
+                            },
+                            {
+                              "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
                             },
                             {
                               "key": {
@@ -477,11 +489,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "prog-a"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -505,11 +537,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "prog-b"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {

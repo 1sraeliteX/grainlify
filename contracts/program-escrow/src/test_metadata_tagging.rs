@@ -504,3 +504,84 @@ fn test_empty_program_metadata() {
     assert_eq!(retrieved.tags.len(), 0);
     assert_eq!(retrieved.custom_fields.len(), 0);
 }
+
+// ============================================================================
+// Test 5: Input Validation
+// ============================================================================
+
+#[test]
+#[should_panic(expected = "Program ID cannot be empty")]
+fn test_program_id_validation_empty() {
+    let s = Setup::new();
+    
+    // Invalid: empty program ID
+    let empty_id = String::from_str(&s.env, "");
+    s.escrow.init_program_with_metadata(
+        &empty_id,
+        &s.backend,
+        &s.token.address,
+        &s.organizer,
+        &Some(s.organizer.clone()),
+        &None,
+    );
+}
+
+#[test]
+#[should_panic(expected = "Program ID exceeds maximum length")]
+fn test_program_id_validation_too_long() {
+    let s = Setup::new();
+    
+    // Invalid: program ID too long
+    let long_id = String::from_str(&s.env, "ThisIsAVeryLongProgramIdentifierThatExceedsTheMaximumAllowedLength");
+    s.escrow.init_program_with_metadata(
+        &long_id,
+        &s.backend,
+        &s.token.address,
+        &s.organizer,
+        &Some(s.organizer.clone()),
+        &None,
+    );
+}
+
+#[test]
+fn test_program_id_validation_valid() {
+    let s = Setup::new();
+    
+    // Valid program ID
+    let valid_id = String::from_str(&s.env, "ValidProgram123");
+    s.escrow.init_program_with_metadata(
+        &valid_id,
+        &s.backend,
+        &s.token.address,
+        &s.organizer,
+        &Some(s.organizer.clone()),
+        &None,
+    );
+    
+    // Verify it was created
+    let program_data = s.escrow.get_program_info(&valid_id);
+    assert_eq!(program_data.program_id, valid_id);
+}
+
+#[test]
+#[should_panic(expected = "tag cannot be empty")]
+fn test_metadata_validation_empty_tag() {
+    let s = Setup::new();
+    let program_id = String::from_str(&s.env, "TestProgram");
+    
+    // Create metadata with empty tag
+    let mut invalid_tags = SdkVec::new(&s.env);
+    invalid_tags.push_back(String::from_str(&s.env, "")); // Empty tag
+    
+    let invalid_metadata = ProgramMetadata {
+        program_name: Some(String::from_str(&s.env, "Valid Program Name")),
+        program_type: Some(String::from_str(&s.env, "hackathon")),
+        ecosystem: Some(String::from_str(&s.env, "stellar")),
+        tags: invalid_tags,
+        start_date: None,
+        end_date: None,
+        custom_fields: SdkVec::new(&s.env),
+    };
+    
+    s.escrow.update_program_metadata(&program_id, invalid_metadata);
+}

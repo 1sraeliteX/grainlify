@@ -40,6 +40,12 @@ rustup install stable
 rustup default stable
 ```
 
+## Jurisdiction Segmentation
+
+Jurisdiction-aware tagging/configuration for escrows and programs is documented in:
+
+- [`contracts/JURISDICTION_SEGMENTATION.md`](./contracts/JURISDICTION_SEGMENTATION.md)
+
 ### Install Soroban CLI
 ```bash
 cargo install --locked soroban-cli
@@ -134,4 +140,3 @@ debug-assertions = true
 ## 6. Local Environment Configuration
 1 .soroban/ folder contains local network config.
 2 .env.example includes variables
-

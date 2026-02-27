@@ -55,7 +55,7 @@ fn setup(
     // Initialize program
     let payout_key = Address::generate(env);
     let program_id = String::from_str(env, "test-prog");
-    client.init_program(&program_id, &payout_key, &token_addr);
+    client.init_program(&program_id, &payout_key, &token_addr, &admin.clone(, &None, &None), &None, &None);
 
     // Fund the contract with tokens and lock them
     if initial_balance > 0 {

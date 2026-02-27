@@ -24,7 +24,8 @@ import {
 
 /** contracts/bounty_escrow/contracts/escrow/src/lib.rs — Error enum */
 const BOUNTY_ESCROW_DISCRIMINANTS: number[] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, /* gap at 15 */ 16, 17, 18,
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
 ];
 
 /** contracts/grainlify-core/src/governance.rs — Error enum */
@@ -71,7 +72,7 @@ describe('Error mapping completeness', () => {
 // =======================================================================
 describe('Numeric error code tables', () => {
   describe('Bounty-escrow', () => {
-    it('maps every contract discriminant (1-18, excluding 15)', () => {
+    it('maps every contract discriminant (1-33)', () => {
       for (const code of BOUNTY_ESCROW_DISCRIMINANTS) {
         expect(BOUNTY_ESCROW_ERROR_MAP[code]).toBeDefined();
       }
@@ -87,9 +88,9 @@ describe('Numeric error code tables', () => {
     });
 
     it('returns generic error for unmapped code', () => {
-      const err = parseContractErrorByCode(15, 'bounty_escrow');
+      const err = parseContractErrorByCode(999, 'bounty_escrow');
       expect(err.code).toBe('CONTRACT_ERROR');
-      expect(err.contractErrorCode).toBe(15);
+      expect(err.contractErrorCode).toBe(999);
       expect(err.message).toContain('Unknown');
     });
   });
@@ -298,12 +299,12 @@ describe('Cross-layer consistency', () => {
 describe('Enum size regression guards', () => {
   it('ContractErrorCode has the expected number of values', () => {
     const count = Object.keys(ContractErrorCode).length;
-    // 10 program-escrow + 17 bounty-escrow + 14 governance + 3 circuit-breaker = 44
-    expect(count).toBe(44);
+    // 10 program-escrow + 33 bounty-escrow + 14 governance + 3 circuit-breaker = 60
+    expect(count).toBe(60);
   });
 
-  it('BOUNTY_ESCROW_ERROR_MAP has 17 entries', () => {
-    expect(Object.keys(BOUNTY_ESCROW_ERROR_MAP).length).toBe(19);
+  it('BOUNTY_ESCROW_ERROR_MAP has 33 entries', () => {
+    expect(Object.keys(BOUNTY_ESCROW_ERROR_MAP).length).toBe(33);
   });
 
   it('GOVERNANCE_ERROR_MAP has 14 entries', () => {

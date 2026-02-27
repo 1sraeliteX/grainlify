@@ -27,7 +27,7 @@ type LandingStatsResponse struct {
 // Notes:
 // - Active projects are verified projects that aren't soft-deleted.
 // - Contributors are distinct GitHub author logins across issues/PRs in verified projects.
-// - Grants distributed is currently 0 (no payouts table implemented yet).
+// - Grants distributed is the sum of on-chain payout amounts (from onchain_events).
 func (h *LandingStatsHandler) Get() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if h.db == nil || h.db.Pool == nil {
@@ -51,18 +51,21 @@ all_contributors AS (
   FROM github_pull_requests gpr
   INNER JOIN verified_projects vp ON vp.id = gpr.project_id
   WHERE gpr.author_login IS NOT NULL AND gpr.author_login != ''
+),
+grants AS (
+  SELECT COALESCE(SUM(amount), 0) AS total
+  FROM onchain_events
+  WHERE topic IN ('f_rel', 'Payout', 'BatchPay')
 )
 SELECT
   (SELECT COUNT(*) FROM verified_projects) AS active_projects,
-  (SELECT COUNT(DISTINCT LOWER(login)) FROM all_contributors) AS contributors
-`).Scan(&resp.ActiveProjects, &resp.Contributors)
+  (SELECT COUNT(DISTINCT LOWER(login)) FROM all_contributors) AS contributors,
+  (SELECT total FROM grants) AS grants_distributed
+`).Scan(&resp.ActiveProjects, &resp.Contributors, &resp.GrantsDistributedUSD)
 		if err != nil {
 			slog.Error("failed to fetch landing stats", "error", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "stats_fetch_failed"})
 		}
-
-		// No payouts/grants table exists yet in the schema.
-		resp.GrantsDistributedUSD = 0
 
 		return c.Status(fiber.StatusOK).JSON(resp)
 	}

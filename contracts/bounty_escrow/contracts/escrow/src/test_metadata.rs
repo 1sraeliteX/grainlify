@@ -21,7 +21,7 @@ fn test_metadata_storage_and_query() {
     let b_type = String::from_str(&env, "bounty");
 
     // 2. Set Metadata (requires admin auth)
-    client.update_metadata(&admin, &bounty_id, &repo_id, &issue_id, &b_type);
+    client.update_metadata(&admin, &bounty_id, &repo_id, &issue_id, &b_type, &None);
 
     // 3. Verify retrieval
     let fetched = client.get_metadata(&bounty_id);

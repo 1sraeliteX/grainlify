@@ -26,19 +26,32 @@ const (
 
 // EscrowData represents escrow information from the contract
 type EscrowData struct {
-	Depositor string       `json:"depositor"`
-	Amount    int64        `json:"amount"`
-	Status    EscrowStatus `json:"status"`
-	Deadline  int64        `json:"deadline"`
+	Depositor    string              `json:"depositor"`
+	Amount       int64               `json:"amount"`
+	Status       EscrowStatus        `json:"status"`
+	Deadline     int64               `json:"deadline"`
+	Jurisdiction *JurisdictionConfig `json:"jurisdiction,omitempty"`
 }
 
 // ProgramEscrowData represents program escrow information
 type ProgramEscrowData struct {
-	ProgramID           string `json:"program_id"`
-	TotalFunds          int64  `json:"total_funds"`
-	RemainingBalance    int64  `json:"remaining_balance"`
-	AuthorizedPayoutKey string `json:"authorized_payout_key"`
-	TokenAddress        string `json:"token_address"`
+	ProgramID           string              `json:"program_id"`
+	TotalFunds          int64               `json:"total_funds"`
+	RemainingBalance    int64               `json:"remaining_balance"`
+	AuthorizedPayoutKey string              `json:"authorized_payout_key"`
+	TokenAddress        string              `json:"token_address"`
+	Jurisdiction        *JurisdictionConfig `json:"jurisdiction,omitempty"`
+}
+
+// JurisdictionConfig represents optional jurisdiction policy metadata emitted by contracts.
+type JurisdictionConfig struct {
+	Tag           string `json:"tag,omitempty"`
+	RequiresKYC   bool   `json:"requires_kyc,omitempty"`
+	EnforceLimits bool   `json:"enforce_limits,omitempty"`
+	LockPaused    bool   `json:"lock_paused,omitempty"`
+	ReleasePaused bool   `json:"release_paused,omitempty"`
+	RefundPaused  bool   `json:"refund_paused,omitempty"`
+	MaxAmount     int64  `json:"max_amount,omitempty"`
 }
 
 // TransactionResult represents the result of a transaction submission
@@ -66,9 +79,9 @@ func (ca *ContractAddress) String() string {
 
 // RetryConfig configures retry behavior for transactions
 type RetryConfig struct {
-	MaxRetries      int
-	InitialDelay    time.Duration
-	MaxDelay        time.Duration
+	MaxRetries        int
+	InitialDelay      time.Duration
+	MaxDelay          time.Duration
 	BackoffMultiplier float64
 }
 

@@ -39,7 +39,7 @@ impl<'a> RbacSetup<'a> {
 
         // Initialize program with operator
         // Note: Currently init_program doesn't have auth, so we can just call it
-        client.init_program(&program_id, &operator, &token_id);
+        client.init_program(&program_id, &operator, &token_id, &admin.clone(, &None, &None), &None, &None);
 
         // Initialize circuit breaker with pauser
         // caller is None for first setting

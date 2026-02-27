@@ -44,6 +44,7 @@ fn setup_program_with_admin<'a>(
         &token_client.address,
         &admin,
         &None,
+        &None,
     );
     (client, admin, payout_key, token_client)
 }
@@ -237,12 +238,13 @@ fn test_set_paused_emits_events() {
     let topic_0: Symbol = topics.get(0).unwrap().into_val(&env);
     assert_eq!(topic_0, Symbol::new(&env, "PauseSt"));
 
-    let data: (Symbol, bool, Address, Option<String>, u64) = emitted.2.try_into_val(&env).unwrap();
-    assert_eq!(data.0, Symbol::new(&env, "lock"));
-    assert_eq!(data.1, true);
-    assert_eq!(data.2, admin);
-    assert_eq!(data.3, None);
-    assert!(data.4 > 0);
+    let data: PauseStateChanged = emitted.2.try_into_val(&env).unwrap();
+    assert_eq!(data.operation, symbol_short!("lock"));
+    assert_eq!(data.paused, true);
+    assert_eq!(data.admin, admin);
+    assert_eq!(data.reason, None);
+    assert!(data.timestamp > 0);
+    assert!(data.receipt_id > 0);
 }
 
 #[test]
@@ -348,7 +350,8 @@ fn setup_rbac_program_env_strict<'a>(
 
     // Initialize program with operator as payout_key
     let program_id = String::from_str(env, "rbac-program");
-    contract_client.init_program(&program_id, &operator, &token_address, &admin, &None);
+    contract_client.init_program(&program_id, &operator, &token_address, &admin, &None, &None);
+
 
     // Mint and lock funds
     let depositor = Address::generate(env);
@@ -390,7 +393,8 @@ fn setup_rbac_program_env<'a>(
 
     // Initialize program with operator as payout_key
     let program_id = String::from_str(env, "rbac-program");
-    contract_client.init_program(&program_id, &operator, &token_address, &admin, &None);
+    contract_client.init_program(&program_id, &operator, &token_address, &admin, &None, &None);
+
 
     // Mint and lock funds
     let depositor = Address::generate(env);
@@ -475,11 +479,12 @@ fn test_rbac_emergency_withdraw_emits_event() {
     assert_eq!(topic_0, Symbol::new(&env, "em_wtd"));
 
     // Verify event data: (admin, target, balance, timestamp)
-    let data: (Address, Address, i128, u64) = last_event.2.try_into_val(&env).unwrap();
-    assert_eq!(data.0, admin);
-    assert_eq!(data.1, target);
-    assert_eq!(data.2, 500i128);
-    assert_eq!(data.3, 54321u64);
+    let data: EmergencyWithdrawEvent = last_event.2.try_into_val(&env).unwrap();
+    assert_eq!(data.admin, admin);
+    assert_eq!(data.target, target);
+    assert_eq!(data.amount, 500i128);
+    assert_eq!(data.timestamp, 54321u64);
+    assert!(data.receipt_id > 0);
 }
 
 /// Idempotent: second emergency_withdraw on empty contract does nothing (no panic)
@@ -573,12 +578,12 @@ fn test_rbac_emergency_withdraw_drains_all_funds() {
     // Initialize contract with admin
     contract_client.initialize_contract(&admin);
 
-    // Initialize multiple programs
+    // Initialize program
     let program_id_1 = String::from_str(&env, "prog-1");
-    contract_client.init_program(&program_id_1, &operator, &token_address, &admin, &None);
+    contract_client.init_program(&program_id_1, &operator, &token_address, &admin, &None, &None);
 
-    let program_id_2 = String::from_str(&env, "prog-2");
-    contract_client.init_program(&program_id_2, &operator, &token_address, &admin, &None);
+    // let program_id_2 = String::from_str(&env, "prog-2");
+    // contract_client.init_program(&program_id_2, &operator, &token_address, &admin, &None, &None);
 
     // Mint and distribute funds to programs
     let depositor = Address::generate(&env);
@@ -629,6 +634,12 @@ fn test_rbac_after_emergency_withdraw_can_unpause_and_reuse() {
     );
 
     // Verify contract can be reused (balance is 0 now but lock should work)
+    // We need to mint tokens to the contract first since lock_program_funds doesn't transfer them from caller
+    let token_admin = Address::generate(&env);
+    let token_sac = token::StellarAssetClient::new(&env, &token_client.address);
+    env.mock_all_auths();
+    token_sac.mint(&contract_client.address, &200);
+
     contract_client.lock_program_funds(&200);
     // Note: this will fail since we drained the contract, but the point is
     // that the pause check passes

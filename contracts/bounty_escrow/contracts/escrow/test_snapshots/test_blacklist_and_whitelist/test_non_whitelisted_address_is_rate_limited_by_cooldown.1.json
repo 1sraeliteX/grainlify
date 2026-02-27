@@ -97,7 +97,8 @@
                 },
                 {
                   "u64": 1086400
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1358,7 +1359,8 @@
                 },
                 {
                   "u64": 1086400
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1512,6 +1514,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -1580,7 +1590,8 @@
                 },
                 {
                   "u64": 1086400
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1633,7 +1644,7 @@
             "data": {
               "vec": [
                 {
-                  "string": "caught panic 'Operation in cooldown period' from contract function 'Symbol(obj#365)'"
+                  "string": "caught panic 'Operation in cooldown period' from contract function 'Symbol(obj#367)'"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
@@ -1649,7 +1660,8 @@
                 },
                 {
                   "u64": 1086400
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1723,7 +1735,8 @@
                     },
                     {
                       "u64": 1086400
-                    }
+                    },
+                    "void"
                   ]
                 }
               ]

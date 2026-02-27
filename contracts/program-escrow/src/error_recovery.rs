@@ -199,6 +199,34 @@ pub fn check_and_allow(env: &Env) -> Result<(), u32> {
     }
 }
 
+/// **Call this before any protected operation with threshold monitoring.**
+///
+/// Checks both circuit breaker state and threshold metrics.
+/// Opens circuit if thresholds are breached.
+pub fn check_and_allow_with_thresholds(env: &Env) -> Result<(), u32> {
+    // First check circuit state
+    check_and_allow(env)?;
+    
+    // Then check thresholds
+    if let Err(breach) = crate::threshold_monitor::check_thresholds(env) {
+        // Threshold breached - open circuit
+        open_circuit(env);
+        crate::threshold_monitor::emit_threshold_breach_event(env, &breach);
+        crate::threshold_monitor::apply_cooldown(env);
+        
+        // Update breach count in metrics
+        let mut metrics = crate::threshold_monitor::get_current_metrics(env);
+        metrics.breach_count += 1;
+        env.storage()
+            .persistent()
+            .set(&crate::threshold_monitor::ThresholdKey::CurrentMetrics, &metrics);
+        
+        return Err(crate::threshold_monitor::ERR_THRESHOLD_BREACHED);
+    }
+    
+    Ok(())
+}
+
 /// **Call this after a SUCCESSFUL protected operation.**
 ///
 /// In HalfOpen: increments success counter; closes the circuit when

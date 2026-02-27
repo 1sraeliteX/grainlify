@@ -20,6 +20,7 @@
 /// * Error flows             – failed attempts do not corrupt metrics
 use crate::{BountyEscrowContract, BountyEscrowContractClient, EscrowStatus, RefundMode};
 use soroban_sdk::{
+    symbol_short,
     testutils::{Address as _, Events, Ledger},
     token, Address, Env,
 };
@@ -80,7 +81,7 @@ fn test_aggregate_stats_reflects_single_lock() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &1, &500, &deadline);
+    escrow.lock_funds(&depositor, &1, &500, &deadline, &None);
 
     let stats = escrow.get_aggregate_stats();
 
@@ -102,9 +103,9 @@ fn test_aggregate_stats_reflects_multiple_locks() {
     token_admin.mint(&depositor, &10_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &10, &1_000, &deadline);
-    escrow.lock_funds(&depositor, &11, &2_000, &deadline);
-    escrow.lock_funds(&depositor, &12, &3_000, &deadline);
+    escrow.lock_funds(&depositor, &10, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &11, &2_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &12, &3_000, &deadline, &None);
 
     let stats = escrow.get_aggregate_stats();
 
@@ -130,7 +131,7 @@ fn test_aggregate_stats_after_release_moves_to_released_bucket() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &20, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &20, &1_000, &deadline, &None);
     escrow.release_funds(&20, &contributor);
 
     let stats = escrow.get_aggregate_stats();
@@ -156,9 +157,9 @@ fn test_aggregate_stats_mixed_lock_and_release() {
 
     let deadline = env.ledger().timestamp() + 1000;
     // Lock three, release one, keep two locked
-    escrow.lock_funds(&depositor, &30, &500, &deadline);
-    escrow.lock_funds(&depositor, &31, &700, &deadline);
-    escrow.lock_funds(&depositor, &32, &300, &deadline);
+    escrow.lock_funds(&depositor, &30, &500, &deadline, &None);
+    escrow.lock_funds(&depositor, &31, &700, &deadline, &None);
+    escrow.lock_funds(&depositor, &32, &300, &deadline, &None);
     escrow.release_funds(&31, &contributor);
 
     let stats = escrow.get_aggregate_stats();
@@ -185,7 +186,7 @@ fn test_aggregate_stats_after_refund_moves_to_refunded_bucket() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 500;
-    escrow.lock_funds(&depositor, &40, &900, &deadline);
+    escrow.lock_funds(&depositor, &40, &900, &deadline, &None);
     // Advance time past deadline
     env.ledger().set_timestamp(deadline + 1);
     escrow.refund(&40);
@@ -212,9 +213,9 @@ fn test_aggregate_stats_full_lifecycle_lock_release_refund() {
 
     let now = env.ledger().timestamp();
     // One of each outcome
-    escrow.lock_funds(&depositor, &50, &1_000, &(now + 500));
-    escrow.lock_funds(&depositor, &51, &2_000, &(now + 500));
-    escrow.lock_funds(&depositor, &52, &3_000, &(now + 5000));
+    escrow.lock_funds(&depositor, &50, &1_000, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &51, &2_000, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &52, &3_000, &(now + 5000), &None);
 
     escrow.release_funds(&50, &contributor); // → released
     env.ledger().set_timestamp(now + 501);
@@ -262,13 +263,13 @@ fn test_escrow_count_increments_on_each_lock() {
 
     assert_eq!(escrow.get_escrow_count(), 0);
 
-    escrow.lock_funds(&depositor, &60, &100, &deadline);
+    escrow.lock_funds(&depositor, &60, &100, &deadline, &None);
     assert_eq!(escrow.get_escrow_count(), 1);
 
-    escrow.lock_funds(&depositor, &61, &100, &deadline);
+    escrow.lock_funds(&depositor, &61, &100, &deadline, &None);
     assert_eq!(escrow.get_escrow_count(), 2);
 
-    escrow.lock_funds(&depositor, &62, &100, &deadline);
+    escrow.lock_funds(&depositor, &62, &100, &deadline, &None);
     assert_eq!(escrow.get_escrow_count(), 3);
 }
 
@@ -285,7 +286,7 @@ fn test_escrow_count_does_not_decrement_after_release() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &63, &500, &deadline);
+    escrow.lock_funds(&depositor, &63, &500, &deadline, &None);
     escrow.release_funds(&63, &contributor);
 
     // Count tracks total created, not currently locked
@@ -304,7 +305,7 @@ fn test_escrow_count_does_not_decrement_after_refund() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 500;
-    escrow.lock_funds(&depositor, &64, &500, &deadline);
+    escrow.lock_funds(&depositor, &64, &500, &deadline, &None);
     env.ledger().set_timestamp(deadline + 1);
     escrow.refund(&64);
 
@@ -328,9 +329,9 @@ fn test_query_by_status_locked_returns_only_locked() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &70, &100, &deadline);
-    escrow.lock_funds(&depositor, &71, &200, &deadline);
-    escrow.lock_funds(&depositor, &72, &300, &deadline);
+    escrow.lock_funds(&depositor, &70, &100, &deadline, &None);
+    escrow.lock_funds(&depositor, &71, &200, &deadline, &None);
+    escrow.lock_funds(&depositor, &72, &300, &deadline, &None);
     escrow.release_funds(&71, &contributor); // 71 becomes Released
 
     let locked = escrow.query_escrows_by_status(&EscrowStatus::Locked, &0, &10);
@@ -361,8 +362,8 @@ fn test_query_by_status_released_returns_only_released() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &80, &400, &deadline);
-    escrow.lock_funds(&depositor, &81, &500, &deadline);
+    escrow.lock_funds(&depositor, &80, &400, &deadline, &None);
+    escrow.lock_funds(&depositor, &81, &500, &deadline, &None);
     escrow.release_funds(&80, &contributor);
 
     let released = escrow.query_escrows_by_status(&EscrowStatus::Released, &0, &10);
@@ -386,8 +387,8 @@ fn test_query_by_status_refunded_returns_only_refunded() {
     token_admin.mint(&depositor, &1_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &90, &600, &(now + 500));
-    escrow.lock_funds(&depositor, &91, &700, &(now + 2000));
+    escrow.lock_funds(&depositor, &90, &600, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &91, &700, &(now + 2000), &None);
     env.ledger().set_timestamp(now + 501);
     escrow.refund(&90);
 
@@ -408,7 +409,7 @@ fn test_query_by_status_empty_when_no_match() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &95, &100, &deadline);
+    escrow.lock_funds(&depositor, &95, &100, &deadline, &None);
 
     // Ask for Released when nothing has been released
     let released = escrow.query_escrows_by_status(&EscrowStatus::Released, &0, &10);
@@ -429,7 +430,7 @@ fn test_query_by_status_pagination_offset_and_limit() {
     let deadline = env.ledger().timestamp() + 2000;
     // Lock 5 bounties, all remain locked
     for id in 100_u64..105 {
-        escrow.lock_funds(&depositor, &id, &100, &deadline);
+        escrow.lock_funds(&depositor, &id, &100, &deadline, &None);
     }
 
     let page1 = escrow.query_escrows_by_status(&EscrowStatus::Locked, &0, &3);
@@ -460,10 +461,10 @@ fn test_query_by_amount_range_returns_matching_escrows() {
     token_admin.mint(&depositor, &10_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &110, &100, &deadline);
-    escrow.lock_funds(&depositor, &111, &500, &deadline);
-    escrow.lock_funds(&depositor, &112, &1_000, &deadline);
-    escrow.lock_funds(&depositor, &113, &5_000, &deadline);
+    escrow.lock_funds(&depositor, &110, &100, &deadline, &None);
+    escrow.lock_funds(&depositor, &111, &500, &deadline, &None);
+    escrow.lock_funds(&depositor, &112, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &113, &5_000, &deadline, &None);
 
     // Query amounts between 200 and 2000
     let results = escrow.query_escrows_by_amount(&200, &2_000, &0, &10);
@@ -486,9 +487,9 @@ fn test_query_by_amount_exact_boundaries_included() {
     token_admin.mint(&depositor, &10_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &120, &1_000, &deadline);
-    escrow.lock_funds(&depositor, &121, &2_000, &deadline);
-    escrow.lock_funds(&depositor, &122, &3_000, &deadline);
+    escrow.lock_funds(&depositor, &120, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &121, &2_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &122, &3_000, &deadline, &None);
 
     let results = escrow.query_escrows_by_amount(&1_000, &2_000, &0, &10);
     assert_eq!(results.len(), 2); // both boundary values are inclusive
@@ -506,8 +507,8 @@ fn test_query_by_amount_no_results_outside_range() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &130, &50, &deadline);
-    escrow.lock_funds(&depositor, &131, &500, &deadline);
+    escrow.lock_funds(&depositor, &130, &50, &deadline, &None);
+    escrow.lock_funds(&depositor, &131, &500, &deadline, &None);
 
     let results = escrow.query_escrows_by_amount(&600, &1_000, &0, &10);
     assert_eq!(results.len(), 0);
@@ -529,10 +530,10 @@ fn test_query_by_deadline_range_filters_correctly() {
     token_admin.mint(&depositor, &1_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &140, &100, &(now + 100));
-    escrow.lock_funds(&depositor, &141, &100, &(now + 500));
-    escrow.lock_funds(&depositor, &142, &100, &(now + 1_000));
-    escrow.lock_funds(&depositor, &143, &100, &(now + 5_000));
+    escrow.lock_funds(&depositor, &140, &100, &(now + 100), &None);
+    escrow.lock_funds(&depositor, &141, &100, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &142, &100, &(now + 1_000), &None);
+    escrow.lock_funds(&depositor, &143, &100, &(now + 5_000), &None);
 
     // Query deadlines between now+200 and now+2000
     let results = escrow.query_escrows_by_deadline(&(now + 200), &(now + 2_000), &0, &10);
@@ -555,8 +556,8 @@ fn test_query_by_deadline_exact_boundary_included() {
     token_admin.mint(&depositor, &1_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &150, &100, &(now + 1_000));
-    escrow.lock_funds(&depositor, &151, &100, &(now + 2_000));
+    escrow.lock_funds(&depositor, &150, &100, &(now + 1_000), &None);
+    escrow.lock_funds(&depositor, &151, &100, &(now + 2_000), &None);
 
     let results = escrow.query_escrows_by_deadline(&(now + 1_000), &(now + 2_000), &0, &10);
     assert_eq!(results.len(), 2);
@@ -583,9 +584,9 @@ fn test_query_by_depositor_returns_only_that_depositors_escrows() {
     token_admin.mint(&depositor_b, &5_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor_a, &160, &1_000, &deadline);
-    escrow.lock_funds(&depositor_a, &161, &2_000, &deadline);
-    escrow.lock_funds(&depositor_b, &162, &3_000, &deadline);
+    escrow.lock_funds(&depositor_a, &160, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor_a, &161, &2_000, &deadline, &None);
+    escrow.lock_funds(&depositor_b, &162, &3_000, &deadline, &None);
 
     let a_results = escrow.query_escrows_by_depositor(&depositor_a, &0, &10);
     assert_eq!(a_results.len(), 2);
@@ -610,7 +611,7 @@ fn test_query_by_depositor_returns_empty_for_unknown_address() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &165, &100, &deadline);
+    escrow.lock_funds(&depositor, &165, &100, &deadline, &None);
 
     let unknown = Address::generate(&env);
     let results = escrow.query_escrows_by_depositor(&unknown, &0, &10);
@@ -634,9 +635,9 @@ fn test_get_escrow_ids_by_status_returns_correct_ids() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &170, &100, &deadline);
-    escrow.lock_funds(&depositor, &171, &200, &deadline);
-    escrow.lock_funds(&depositor, &172, &300, &deadline);
+    escrow.lock_funds(&depositor, &170, &100, &deadline, &None);
+    escrow.lock_funds(&depositor, &171, &200, &deadline, &None);
+    escrow.lock_funds(&depositor, &172, &300, &deadline, &None);
     escrow.release_funds(&171, &contributor);
 
     let locked_ids = escrow.get_escrow_ids_by_status(&EscrowStatus::Locked, &0, &10);
@@ -661,7 +662,7 @@ fn test_get_escrow_ids_by_status_empty_when_no_match() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &175, &100, &deadline);
+    escrow.lock_funds(&depositor, &175, &100, &deadline, &None);
 
     let released_ids = escrow.get_escrow_ids_by_status(&EscrowStatus::Released, &0, &10);
     assert_eq!(released_ids.len(), 0);
@@ -683,7 +684,7 @@ fn test_refund_eligibility_false_before_deadline() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &180, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &180, &1_000, &deadline, &None);
 
     let (can_refund, deadline_passed, remaining, approval) = escrow.get_refund_eligibility(&180);
 
@@ -705,7 +706,7 @@ fn test_refund_eligibility_true_after_deadline_passes() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 500;
-    escrow.lock_funds(&depositor, &181, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &181, &1_000, &deadline, &None);
     env.ledger().set_timestamp(deadline + 1);
 
     let (can_refund, deadline_passed, remaining, approval) = escrow.get_refund_eligibility(&181);
@@ -729,7 +730,7 @@ fn test_refund_eligibility_false_after_release() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &182, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &182, &1_000, &deadline, &None);
     escrow.release_funds(&182, &contributor);
 
     // After release the status is Released, so can_refund must be false
@@ -750,7 +751,7 @@ fn test_refund_eligibility_true_with_admin_approval_before_deadline() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 5000;
-    escrow.lock_funds(&depositor, &183, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &183, &1_000, &deadline, &None);
 
     // Admin approves a partial refund before the deadline
     escrow.approve_refund(&183, &500, &depositor, &RefundMode::Partial);
@@ -780,7 +781,7 @@ fn test_refund_history_empty_before_any_refund() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 2000;
-    escrow.lock_funds(&depositor, &190, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &190, &1_000, &deadline, &None);
 
     let history = escrow.get_refund_history(&190);
     assert_eq!(
@@ -820,7 +821,7 @@ fn test_lock_emits_at_least_one_event() {
 
     let before = env.events().all().len();
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &200, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &200, &1_000, &deadline, &None);
     let after = env.events().all().len();
 
     assert!(
@@ -842,7 +843,7 @@ fn test_release_emits_at_least_one_event() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &201, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &201, &1_000, &deadline, &None);
 
     let before = env.events().all().len();
     escrow.release_funds(&201, &contributor);
@@ -866,7 +867,7 @@ fn test_refund_emits_at_least_one_event() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 500;
-    escrow.lock_funds(&depositor, &202, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &202, &1_000, &deadline, &None);
     env.ledger().set_timestamp(deadline + 1);
 
     let before = env.events().all().len();
@@ -893,11 +894,11 @@ fn test_event_count_scales_linearly_with_locks() {
     let deadline = env.ledger().timestamp() + 1000;
 
     let baseline = env.events().all().len();
-    escrow.lock_funds(&depositor, &210, &100, &deadline);
+    escrow.lock_funds(&depositor, &210, &100, &deadline, &None);
     let after_first = env.events().all().len();
     let one_lock_events = after_first - baseline;
 
-    escrow.lock_funds(&depositor, &211, &100, &deadline);
+    escrow.lock_funds(&depositor, &211, &100, &deadline, &None);
     let after_second = env.events().all().len();
     let two_lock_events = after_second - baseline;
 
@@ -928,7 +929,7 @@ fn test_duplicate_lock_does_not_affect_first_lock_state() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &220, &1_000, &deadline);
+    escrow.lock_funds(&depositor, &220, &1_000, &deadline, &None);
 
     let stats = escrow.get_aggregate_stats();
     assert_eq!(stats.count_locked, 1);
@@ -949,8 +950,8 @@ fn test_analytics_invariant_total_amounts_are_non_negative() {
     token_admin.mint(&depositor, &1_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &240, &500, &(now + 500));
-    escrow.lock_funds(&depositor, &241, &300, &(now + 1000));
+    escrow.lock_funds(&depositor, &240, &500, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &241, &300, &(now + 1000), &None);
     escrow.release_funds(&240, &contributor);
     env.ledger().set_timestamp(now + 1001);
     escrow.refund(&241);
@@ -984,9 +985,9 @@ fn test_count_matches_query_by_status_total() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &250, &100, &deadline);
-    escrow.lock_funds(&depositor, &251, &200, &deadline);
-    escrow.lock_funds(&depositor, &252, &300, &deadline);
+    escrow.lock_funds(&depositor, &250, &100, &deadline, &None);
+    escrow.lock_funds(&depositor, &251, &200, &deadline, &None);
+    escrow.lock_funds(&depositor, &252, &300, &deadline, &None);
     escrow.release_funds(&250, &contributor);
 
     let total_count = escrow.get_escrow_count();
@@ -1014,8 +1015,8 @@ fn test_ids_view_matches_full_object_view_count() {
     token_admin.mint(&depositor, &1_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &260, &100, &deadline);
-    escrow.lock_funds(&depositor, &261, &200, &deadline);
+    escrow.lock_funds(&depositor, &260, &100, &deadline, &None);
+    escrow.lock_funds(&depositor, &261, &200, &deadline, &None);
     escrow.release_funds(&261, &contributor);
 
     let locked_objs = escrow.query_escrows_by_status(&EscrowStatus::Locked, &0, &50);
@@ -1041,9 +1042,9 @@ fn test_aggregate_stats_consistent_with_individual_escrow_queries() {
     token_admin.mint(&depositor, &10_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &270, &1_000, &(now + 1000));
-    escrow.lock_funds(&depositor, &271, &2_000, &(now + 500));
-    escrow.lock_funds(&depositor, &272, &3_000, &(now + 2000));
+    escrow.lock_funds(&depositor, &270, &1_000, &(now + 1000), &None);
+    escrow.lock_funds(&depositor, &271, &2_000, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &272, &3_000, &(now + 2000), &None);
 
     escrow.release_funds(&270, &contributor);
     env.ledger().set_timestamp(now + 501);
@@ -1084,8 +1085,8 @@ fn test_get_balance_matches_locked_total_after_locks() {
     token_admin.mint(&depositor, &10_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &280, &1_000, &deadline);
-    escrow.lock_funds(&depositor, &281, &2_000, &deadline);
+    escrow.lock_funds(&depositor, &280, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &281, &2_000, &deadline, &None);
 
     let balance = escrow.get_balance();
     let stats = escrow.get_aggregate_stats();
@@ -1112,8 +1113,8 @@ fn test_get_balance_decreases_after_release() {
     token_admin.mint(&depositor, &10_000_000);
 
     let deadline = env.ledger().timestamp() + 1000;
-    escrow.lock_funds(&depositor, &290, &1_000, &deadline);
-    escrow.lock_funds(&depositor, &291, &500, &deadline);
+    escrow.lock_funds(&depositor, &290, &1_000, &deadline, &None);
+    escrow.lock_funds(&depositor, &291, &500, &deadline, &None);
 
     let before_release = escrow.get_balance();
     escrow.release_funds(&290, &contributor);
@@ -1136,8 +1137,8 @@ fn test_get_balance_zero_after_all_escrows_settled() {
     token_admin.mint(&depositor, &10_000_000);
 
     let now = env.ledger().timestamp();
-    escrow.lock_funds(&depositor, &295, &1_000, &(now + 500));
-    escrow.lock_funds(&depositor, &296, &500, &(now + 500));
+    escrow.lock_funds(&depositor, &295, &1_000, &(now + 500), &None);
+    escrow.lock_funds(&depositor, &296, &500, &(now + 500), &None);
 
     escrow.release_funds(&295, &contributor);
     env.ledger().set_timestamp(now + 501);
@@ -1148,4 +1149,180 @@ fn test_get_balance_zero_after_all_escrows_settled() {
         0,
         "contract balance must be zero when all escrows are settled"
     );
+}
+
+// ===========================================================================
+// 16. Monitoring Analytics (Operation counts and error tracking)
+// ===========================================================================
+
+#[test]
+fn test_monitoring_analytics_initial_state() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let (token, _token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+
+    let analytics = escrow.get_analytics();
+    assert_eq!(analytics.operation_count, 0);
+    assert_eq!(analytics.error_count, 0);
+    assert_eq!(analytics.error_rate, 0);
+}
+
+#[test]
+fn test_monitoring_analytics_tracks_successful_operations() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
+    let depositor = Address::generate(&env);
+    let contributor = Address::generate(&env);
+    let (token, token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+    token_admin.mint(&depositor, &1_000_000);
+
+    let now = env.ledger().timestamp();
+
+    // 1. Lock (Success)
+    escrow.lock_funds(&depositor, &500, &1000, &(now + 1000));
+    let analytics = escrow.get_analytics();
+    assert_eq!(analytics.operation_count, 1);
+    assert_eq!(analytics.error_count, 0);
+
+    // 2. Release (Success)
+    escrow.release_funds(&500, &contributor);
+    let analytics = escrow.get_analytics();
+    assert_eq!(analytics.operation_count, 2);
+    assert_eq!(analytics.error_count, 0);
+}
+
+#[test]
+fn test_monitoring_analytics_tracks_failed_operations() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
+    let depositor = Address::generate(&env);
+    let (token, token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+    token_admin.mint(&depositor, &1_000_000);
+
+    let now = env.ledger().timestamp();
+
+    // 1. Successful Lock (tracked via wrapper)
+    escrow.lock_funds(&depositor, &600, &1000, &(now + 1000));
+    let analytics_mid = escrow.get_analytics();
+    assert_eq!(
+        analytics_mid.operation_count, 1,
+        "Should have 1 operation after lock"
+    );
+
+    // 2. Failed Operation (manually tracked to verify monitoring logic works)
+    env.as_contract(&escrow.address, || {
+        crate::monitoring::track_operation(&env, symbol_short!("lock"), depositor.clone(), false);
+    });
+
+    let analytics = escrow.get_analytics();
+    assert_eq!(
+        analytics.operation_count, 2,
+        "Should have 2 operations after manual track"
+    );
+    assert_eq!(analytics.error_count, 1);
+    // error_rate = (1 * 10000) / 2 = 5000 (basis points result of 50.00%)
+    assert_eq!(analytics.error_rate, 5000);
+}
+
+#[test]
+fn test_monitoring_health_check_returns_valid_data() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let (token, _token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+
+    let health = escrow.health_check();
+    assert!(health.is_healthy);
+    assert_eq!(health.total_operations, 0);
+}
+
+#[test]
+fn test_monitoring_state_snapshot_captures_current_metrics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
+    let depositor = Address::generate(&env);
+    let (token, token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+    token_admin.mint(&depositor, &1_000_000);
+
+    let now = env.ledger().timestamp();
+    escrow.lock_funds(&depositor, &700, &1000, &(now + 1000));
+
+    let snapshot = escrow.get_state_snapshot();
+    assert_eq!(snapshot.total_operations, 1);
+    assert_eq!(snapshot.timestamp, now);
+}
+
+#[test]
+fn test_comprehensive_analytics_flow() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
+    let depositor = Address::generate(&env);
+    let contributor = Address::generate(&env);
+    let (token, token_admin) = create_token_contract(&env, &admin);
+    let escrow = create_escrow_contract(&env);
+    escrow.init(&admin, &token.address);
+    token_admin.mint(&depositor, &1_000_000);
+
+    let now = env.ledger().timestamp();
+
+    // 1. Lock 3 different bounties
+    escrow.lock_funds(&depositor, &100, &1000, &(now + 1000));
+    escrow.lock_funds(&depositor, &200, &2000, &(now + 2000));
+    escrow.lock_funds(&depositor, &300, &3000, &(now + 3000));
+
+    // 2. Release one
+    escrow.release_funds(&100, &contributor);
+
+    // 3. Refund one
+    env.ledger().set_timestamp(now + 2500);
+    escrow.refund(&200);
+
+    let stats = escrow.get_aggregate_stats();
+    let analytics = escrow.get_analytics();
+
+    // Aggregate Stats (on-the-fly calculation from storage)
+    assert_eq!(stats.count_locked, 1); // Bounty 300
+    assert_eq!(stats.count_released, 1); // Bounty 100
+    assert_eq!(stats.count_refunded, 1); // Bounty 200
+    assert_eq!(stats.total_locked, 3000);
+    assert_eq!(stats.total_released, 1000);
+    assert_eq!(stats.total_refunded, 2000);
+
+    // Monitoring Analytics (Persistent counters)
+    // ops: lock x3, release x1, refund x1 = 5 (init doesn't track)
+    assert_eq!(analytics.operation_count, 5);
+    assert_eq!(analytics.error_count, 0);
+}
+
+#[test]
+fn test_error_rate_calculation_various_inputs() {
+    let env = Env::default();
+    let escrow = create_escrow_contract(&env);
+    let caller = Address::generate(&env);
+
+    env.as_contract(&escrow.address, || {
+        // 10 ops, 2 errors = 20%
+        for i in 0..10 {
+            crate::monitoring::track_operation(&env, symbol_short!("test"), caller.clone(), i >= 2);
+        }
+    });
+
+    let analytics = escrow.get_analytics();
+    assert_eq!(analytics.operation_count, 10);
+    assert_eq!(analytics.error_count, 2);
+    // 2/10 * 10000 = 2000 basis points
+    assert_eq!(analytics.error_rate, 2000);
 }

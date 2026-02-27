@@ -1278,6 +1278,51 @@
             "data": {
               "map": [
                 {
+<<<<<<< HEAD:contracts/bounty_escrow/contracts/escrow/test_snapshots/test_granular_pause/test_batch_lock_blocked_even_with_only_lock_paused.1.json
+                  "map": [
+                    {
+                      "key": {
+                        "symbol": "amount"
+                      },
+                      "val": {
+                        "i128": {
+                          "hi": 0,
+                          "lo": 100
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "bounty_id"
+                      },
+                      "val": {
+                        "u64": 30
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "deadline"
+                      },
+                      "val": {
+                        "u64": 1000
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "depositor"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "non_transferable_rewards"
+                      },
+                      "val": {
+                        "bool": false
+                      }
+=======
                   "key": {
                     "symbol": "fee_enabled"
                   },
@@ -1301,6 +1346,7 @@
                     "i128": {
                       "hi": 0,
                       "lo": 0
+>>>>>>> upstream:contracts/bounty_escrow/contracts/escrow/test_snapshots/test_multi_token_fees/test_multi_token_fees/test_fee_flag_enabled_on_one_contract_but_not_other.1.json
                     }
                   }
                 },
@@ -1380,6 +1426,59 @@
                   }
                 },
                 {
+<<<<<<< HEAD:contracts/bounty_escrow/contracts/escrow/test_snapshots/test_granular_pause/test_batch_lock_blocked_even_with_only_lock_paused.1.json
+                  "vec": [
+                    {
+                      "vec": [
+                        {
+                          "map": [
+                            {
+                              "key": {
+                                "symbol": "amount"
+                              },
+                              "val": {
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 100
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "bounty_id"
+                              },
+                              "val": {
+                                "u64": 30
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "deadline"
+                              },
+                              "val": {
+                                "u64": 1000
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "depositor"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "non_transferable_rewards"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            }
+                          ]
+                        }
+                      ]
+=======
                   "key": {
                     "symbol": "lock_fee_rate"
                   },
@@ -1387,6 +1486,7 @@
                     "i128": {
                       "hi": 0,
                       "lo": 0
+>>>>>>> upstream:contracts/bounty_escrow/contracts/escrow/test_snapshots/test_multi_token_fees/test_multi_token_fees/test_fee_flag_enabled_on_one_contract_but_not_other.1.json
                     }
                   }
                 },

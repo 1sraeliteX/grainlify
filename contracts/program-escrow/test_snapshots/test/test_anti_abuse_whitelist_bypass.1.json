@@ -50,7 +50,25 @@
       ]
     ],
     [],
-    [],
+    [
+      [
+        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
+        {
+          "function": {
+            "contract_fn": {
+              "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+              "function_name": "set_admin",
+              "args": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                }
+              ]
+            }
+          },
+          "sub_invocations": []
+        }
+      ]
+    ],
     [],
     [
       [
@@ -1062,6 +1080,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -1127,6 +1151,69 @@
                         },
                         "val": {
                           "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "MaintenanceMode"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "bool": false
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "PauseFlags"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
+                            {
+                              "key": {
+                                "symbol": "lock_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "pause_reason"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
+                                "symbol": "paused_at"
+                              },
+                              "val": {
+                                "u64": 0
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "refund_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "release_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            }
+                          ]
                         }
                       }
                     ]
@@ -1425,6 +1512,39 @@
                 "key": {
                   "ledger_key_nonce": {
                     "nonce": 4270020994084947596
+                  }
+                },
+                "durability": "temporary",
+                "val": "void"
+              }
+            },
+            "ext": "v0"
+          },
+          6311999
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
+            "key": {
+              "ledger_key_nonce": {
+                "nonce": 4571470874178140630
+              }
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
+                "key": {
+                  "ledger_key_nonce": {
+                    "nonce": 4571470874178140630
                   }
                 },
                 "durability": "temporary",
@@ -2134,6 +2254,7 @@
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
+                "void",
                 "void"
               ]
             }
@@ -2257,6 +2378,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {
@@ -2523,6 +2650,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {
@@ -3015,6 +3148,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -3362,6 +3501,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -3740,6 +3885,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -4149,6 +4300,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -4589,6 +4746,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -5060,6 +5223,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -5562,6 +5731,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -6095,6 +6270,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -6659,6 +6840,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -7254,6 +7441,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -7880,6 +8073,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -8537,6 +8736,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -9225,6 +9430,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -9944,6 +10155,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -10694,6 +10911,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -11270,6 +11493,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {

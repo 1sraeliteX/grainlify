@@ -72,7 +72,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1487,7 +1488,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1637,6 +1639,14 @@
                   },
                   "val": {
                     "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                  }
+                },
+                {
+                  "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
                   }
                 },
                 {

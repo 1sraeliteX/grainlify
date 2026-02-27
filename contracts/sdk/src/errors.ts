@@ -87,9 +87,25 @@ export enum ContractErrorCode {
   BOUNTY_DUPLICATE_ID        = 'BOUNTY_DUPLICATE_ID',          // 12
   BOUNTY_INVALID_AMOUNT      = 'BOUNTY_INVALID_AMOUNT',        // 13
   BOUNTY_INVALID_DEADLINE    = 'BOUNTY_INVALID_DEADLINE',      // 14
+  BOUNTY_RESERVED            = 'BOUNTY_RESERVED',              // 15 (reserved)
   BOUNTY_INSUFFICIENT_FUNDS  = 'BOUNTY_INSUFFICIENT_FUNDS',    // 16
   BOUNTY_REFUND_NOT_APPROVED = 'BOUNTY_REFUND_NOT_APPROVED',   // 17
   BOUNTY_FUNDS_PAUSED        = 'BOUNTY_FUNDS_PAUSED',          // 18
+  BOUNTY_AMOUNT_BELOW_MIN    = 'BOUNTY_AMOUNT_BELOW_MIN',      // 19
+  BOUNTY_AMOUNT_ABOVE_MAX    = 'BOUNTY_AMOUNT_ABOVE_MAX',      // 20
+  BOUNTY_NOT_PAUSED          = 'BOUNTY_NOT_PAUSED',            // 21
+  BOUNTY_CLAIM_PENDING       = 'BOUNTY_CLAIM_PENDING',         // 22
+  BOUNTY_TICKET_NOT_FOUND   = 'BOUNTY_TICKET_NOT_FOUND',      // 23
+  BOUNTY_TICKET_ALREADY_USED = 'BOUNTY_TICKET_ALREADY_USED',  // 24
+  BOUNTY_TICKET_EXPIRED      = 'BOUNTY_TICKET_EXPIRED',        // 25
+  BOUNTY_CAPABILITY_NOT_FOUND = 'BOUNTY_CAPABILITY_NOT_FOUND', // 26
+  BOUNTY_CAPABILITY_EXPIRED  = 'BOUNTY_CAPABILITY_EXPIRED',    // 27
+  BOUNTY_CAPABILITY_REVOKED  = 'BOUNTY_CAPABILITY_REVOKED',    // 28
+  BOUNTY_CAPABILITY_ACTION_MISMATCH = 'BOUNTY_CAPABILITY_ACTION_MISMATCH', // 29
+  BOUNTY_CAPABILITY_AMOUNT_EXCEEDED = 'BOUNTY_CAPABILITY_AMOUNT_EXCEEDED', // 30
+  BOUNTY_CAPABILITY_USES_EXHAUSTED  = 'BOUNTY_CAPABILITY_USES_EXHAUSTED',  // 31
+  BOUNTY_CAPABILITY_EXCEEDS_AUTHORITY = 'BOUNTY_CAPABILITY_EXCEEDS_AUTHORITY', // 32
+  BOUNTY_INVALID_ASSET_ID    = 'BOUNTY_INVALID_ASSET_ID',      // 33
 
   // ── Governance (contracts/grainlify-core/governance) ───────────────────
   GOV_NOT_INITIALIZED        = 'GOV_NOT_INITIALIZED',          // 1
@@ -145,9 +161,25 @@ const CONTRACT_ERROR_MESSAGES: Record<ContractErrorCode, string> = {
   [ContractErrorCode.BOUNTY_DUPLICATE_ID]:        'Duplicate bounty ID found in batch',
   [ContractErrorCode.BOUNTY_INVALID_AMOUNT]:      'Bounty amount is invalid (zero, negative, or exceeds available)',
   [ContractErrorCode.BOUNTY_INVALID_DEADLINE]:    'Bounty deadline is invalid (in the past or too far in the future)',
+  [ContractErrorCode.BOUNTY_RESERVED]:             'Reserved error code (unused)',
   [ContractErrorCode.BOUNTY_INSUFFICIENT_FUNDS]:  'Insufficient funds in the escrow for this operation',
   [ContractErrorCode.BOUNTY_REFUND_NOT_APPROVED]: 'Refund has not been approved by an admin',
   [ContractErrorCode.BOUNTY_FUNDS_PAUSED]:        'Bounty fund operations are currently paused',
+  [ContractErrorCode.BOUNTY_AMOUNT_BELOW_MIN]:    'Bounty amount is below the configured minimum',
+  [ContractErrorCode.BOUNTY_AMOUNT_ABOVE_MAX]:    'Bounty amount exceeds the configured maximum',
+  [ContractErrorCode.BOUNTY_NOT_PAUSED]:          'Operation requires the contract to be paused',
+  [ContractErrorCode.BOUNTY_CLAIM_PENDING]:       'Refund blocked by a pending claim or dispute',
+  [ContractErrorCode.BOUNTY_TICKET_NOT_FOUND]:    'Claim ticket not found',
+  [ContractErrorCode.BOUNTY_TICKET_ALREADY_USED]: 'Claim ticket has already been used',
+  [ContractErrorCode.BOUNTY_TICKET_EXPIRED]:       'Claim ticket has expired',
+  [ContractErrorCode.BOUNTY_CAPABILITY_NOT_FOUND]: 'Capability token not found',
+  [ContractErrorCode.BOUNTY_CAPABILITY_EXPIRED]:  'Capability token has expired',
+  [ContractErrorCode.BOUNTY_CAPABILITY_REVOKED]:  'Capability token has been revoked',
+  [ContractErrorCode.BOUNTY_CAPABILITY_ACTION_MISMATCH]: 'Capability action does not match the requested operation',
+  [ContractErrorCode.BOUNTY_CAPABILITY_AMOUNT_EXCEEDED]: 'Operation amount exceeds capability limit',
+  [ContractErrorCode.BOUNTY_CAPABILITY_USES_EXHAUSTED]:  'Capability has no remaining uses',
+  [ContractErrorCode.BOUNTY_CAPABILITY_EXCEEDS_AUTHORITY]: 'Capability exceeds the authority of the issuer',
+  [ContractErrorCode.BOUNTY_INVALID_ASSET_ID]:    'Invalid asset identifier',
 
   // Governance
   [ContractErrorCode.GOV_NOT_INITIALIZED]:        'Governance contract has not been initialized',
@@ -191,11 +223,25 @@ export const BOUNTY_ESCROW_ERROR_MAP: Record<number, ContractErrorCode> = {
   12: ContractErrorCode.BOUNTY_DUPLICATE_ID,
   13: ContractErrorCode.BOUNTY_INVALID_AMOUNT,
   14: ContractErrorCode.BOUNTY_INVALID_DEADLINE,
+  15: ContractErrorCode.BOUNTY_RESERVED,
   16: ContractErrorCode.BOUNTY_INSUFFICIENT_FUNDS,
   17: ContractErrorCode.BOUNTY_REFUND_NOT_APPROVED,
   18: ContractErrorCode.BOUNTY_FUNDS_PAUSED,
-  19: ContractErrorCode.AMOUNT_BELOW_MIN,
-  20: ContractErrorCode.AMOUNT_ABOVE_MAX,
+  19: ContractErrorCode.BOUNTY_AMOUNT_BELOW_MIN,
+  20: ContractErrorCode.BOUNTY_AMOUNT_ABOVE_MAX,
+  21: ContractErrorCode.BOUNTY_NOT_PAUSED,
+  22: ContractErrorCode.BOUNTY_CLAIM_PENDING,
+  23: ContractErrorCode.BOUNTY_TICKET_NOT_FOUND,
+  24: ContractErrorCode.BOUNTY_TICKET_ALREADY_USED,
+  25: ContractErrorCode.BOUNTY_TICKET_EXPIRED,
+  26: ContractErrorCode.BOUNTY_CAPABILITY_NOT_FOUND,
+  27: ContractErrorCode.BOUNTY_CAPABILITY_EXPIRED,
+  28: ContractErrorCode.BOUNTY_CAPABILITY_REVOKED,
+  29: ContractErrorCode.BOUNTY_CAPABILITY_ACTION_MISMATCH,
+  30: ContractErrorCode.BOUNTY_CAPABILITY_AMOUNT_EXCEEDED,
+  31: ContractErrorCode.BOUNTY_CAPABILITY_USES_EXHAUSTED,
+  32: ContractErrorCode.BOUNTY_CAPABILITY_EXCEEDS_AUTHORITY,
+  33: ContractErrorCode.BOUNTY_INVALID_ASSET_ID,
 };
 
 /** Governance #[contracterror] discriminants → SDK code */

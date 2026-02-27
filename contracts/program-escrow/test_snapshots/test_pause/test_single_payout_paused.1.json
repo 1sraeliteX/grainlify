@@ -194,6 +194,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -227,6 +233,14 @@
                       },
                       {
                         "key": {
+                          "symbol": "RcptID"
+                        },
+                        "val": {
+                          "u64": 1
+                        }
+                      },
+                      {
+                        "key": {
                           "symbol": "RelHist"
                         },
                         "val": {
@@ -251,6 +265,18 @@
                         },
                         "val": {
                           "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "MaintenanceMode"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "bool": false
                         }
                       },
                       {
@@ -682,6 +708,7 @@
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
+                "void",
                 "void"
               ]
             }
@@ -808,6 +835,12 @@
                 },
                 {
                   "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
                     "symbol": "remaining_balance"
                   },
                   "val": {
@@ -889,19 +922,52 @@
               }
             ],
             "data": {
-              "vec": [
+              "map": [
                 {
-                  "symbol": "release"
+                  "key": {
+                    "symbol": "admin"
+                  },
+                  "val": {
+                    "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  }
                 },
                 {
-                  "bool": true
+                  "key": {
+                    "symbol": "operation"
+                  },
+                  "val": {
+                    "symbol": "release"
+                  }
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "key": {
+                    "symbol": "paused"
+                  },
+                  "val": {
+                    "bool": true
+                  }
                 },
-                "void",
                 {
-                  "u64": 0
+                  "key": {
+                    "symbol": "reason"
+                  },
+                  "val": "void"
+                },
+                {
+                  "key": {
+                    "symbol": "receipt_id"
+                  },
+                  "val": {
+                    "u64": 1
+                  }
+                },
+                {
+                  "key": {
+                    "symbol": "timestamp"
+                  },
+                  "val": {
+                    "u64": 0
+                  }
                 }
               ]
             }
@@ -982,7 +1048,7 @@
             "data": {
               "vec": [
                 {
-                  "string": "caught panic 'Funds Paused' from contract function 'Symbol(obj#243)'"
+                  "string": "caught panic 'Funds Paused' from contract function 'Symbol(obj#315)'"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4"

@@ -97,7 +97,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           },
@@ -152,7 +153,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1556,7 +1558,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1710,6 +1713,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -1778,7 +1789,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1932,6 +1944,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -2000,7 +2020,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           }
@@ -2053,7 +2074,7 @@
             "data": {
               "vec": [
                 {
-                  "string": "caught panic 'Rate limit exceeded' from contract function 'Symbol(obj#573)'"
+                  "string": "caught panic 'Rate limit exceeded' from contract function 'Symbol(obj#553)'"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
@@ -2069,7 +2090,8 @@
                 },
                 {
                   "u64": 10000
-                }
+                },
+                "void"
               ]
             }
           }
@@ -2143,7 +2165,8 @@
                     },
                     {
                       "u64": 10000
-                    }
+                    },
+                    "void"
                   ]
                 }
               ]

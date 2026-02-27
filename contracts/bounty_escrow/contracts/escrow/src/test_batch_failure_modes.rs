@@ -76,6 +76,7 @@ mod test_batch_failure_modes {
             depositor,
             amount,
             deadline,
+            non_transferable_rewards: false,
         }
     }
 
@@ -188,7 +189,7 @@ mod test_batch_failure_modes {
         // Pre-lock bounty 42 via the single-lock path
         let depositor = Address::generate(&env);
         mint(&env, &token_id, &token_admin, &depositor, 2_000);
-        client.lock_funds(&depositor, &42, &1_000, &deadline);
+        client.lock_funds(&depositor, &42, &1_000, &deadline, &None);
 
         // Now try to batch-lock using the same bounty_id
         let dep2 = Address::generate(&env);
@@ -282,6 +283,7 @@ mod test_batch_failure_modes {
                 depositor,
                 amount: 100,
                 deadline: 9_999_999,
+                non_transferable_rewards: false,
             },
         ];
 
@@ -315,7 +317,7 @@ mod test_batch_failure_modes {
         mint(&env, &token_id, &token_admin, &depositor, 1_000);
 
         let deadline = env.ledger().timestamp() + 3_600;
-        client.lock_funds(&depositor, &1, &1_000, &deadline);
+        client.lock_funds(&depositor, &1, &1_000, &deadline, &None);
 
         let items = vec![
             &env,
@@ -371,7 +373,7 @@ mod test_batch_failure_modes {
         let depositor = Address::generate(&env);
         mint(&env, &token_id, &token_admin, &depositor, 1_000);
         let deadline = env.ledger().timestamp() + 3_600;
-        client.lock_funds(&depositor, &5, &1_000, &deadline);
+        client.lock_funds(&depositor, &5, &1_000, &deadline, &None);
 
         let c1 = Address::generate(&env);
         let c2 = Address::generate(&env);
@@ -419,7 +421,7 @@ mod test_batch_failure_modes {
         let depositor = Address::generate(&env);
         mint(&env, &token_id, &token_admin, &depositor, 1_000);
         let deadline = env.ledger().timestamp() + 3_600;
-        client.lock_funds(&depositor, &1, &1_000, &deadline);
+        client.lock_funds(&depositor, &1, &1_000, &deadline, &None);
 
         let c1 = Address::generate(&env);
         let items = vec![
@@ -453,7 +455,7 @@ mod test_batch_failure_modes {
         let depositor = Address::generate(&env);
         mint(&env, &token_id, &token_admin, &depositor, 1_000);
         let deadline = env.ledger().timestamp() + 3_600;
-        client.lock_funds(&depositor, &7, &1_000, &deadline);
+        client.lock_funds(&depositor, &7, &1_000, &deadline, &None);
 
         let contributor = Address::generate(&env);
         // First release succeeds
@@ -483,8 +485,8 @@ mod test_batch_failure_modes {
         mint(&env, &token_id, &token_admin, &dep1, 500);
         mint(&env, &token_id, &token_admin, &dep2, 500);
 
-        client.lock_funds(&dep1, &20, &500, &deadline);
-        client.lock_funds(&dep2, &21, &500, &deadline);
+        client.lock_funds(&dep1, &20, &500, &deadline, &None);
+        client.lock_funds(&dep2, &21, &500, &deadline, &None);
 
         // Advance past deadline and refund bounty 21
         advance_time(&env, 10);
@@ -554,7 +556,7 @@ mod test_batch_failure_modes {
         for i in 30..33u64 {
             let dep = Address::generate(&env);
             mint(&env, &token_id, &token_admin, &dep, 200);
-            client.lock_funds(&dep, &i, &200, &deadline);
+            client.lock_funds(&dep, &i, &200, &deadline, &None);
             depositors.push_back(dep);
         }
 

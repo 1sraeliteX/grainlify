@@ -104,11 +104,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "same-id"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -132,11 +152,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "same-id"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -246,11 +286,31 @@
                             },
                             {
                               "key": {
+                                "symbol": "creator"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "initial_liquidity"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "program_id"
                               },
                               "val": {
                                 "string": "same-id"
                               }
+                            },
+                            {
+                              "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
                             },
                             {
                               "key": {
@@ -274,11 +334,31 @@
                             },
                             {
                               "key": {
+                                "symbol": "creator"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "initial_liquidity"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "program_id"
                               },
                               "val": {
                                 "string": "same-id"
                               }
+                            },
+                            {
+                              "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
                             },
                             {
                               "key": {

@@ -365,6 +365,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -418,6 +424,81 @@
                         },
                         "val": {
                           "vec": []
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Admin"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "MaintenanceMode"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "bool": false
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "PauseFlags"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
+                            {
+                              "key": {
+                                "symbol": "lock_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "pause_reason"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
+                                "symbol": "paused_at"
+                              },
+                              "val": {
+                                "u64": 0
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "refund_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "release_paused"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            }
+                          ]
                         }
                       }
                     ]
@@ -1109,6 +1190,7 @@
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
+                "void",
                 "void"
               ]
             }
@@ -1232,6 +1314,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {
@@ -1498,6 +1586,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {
@@ -1822,6 +1916,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {
@@ -2309,6 +2409,12 @@
                   "val": {
                     "string": "hack-2026"
                   }
+                },
+                {
+                  "key": {
+                    "symbol": "reference_hash"
+                  },
+                  "val": "void"
                 },
                 {
                   "key": {

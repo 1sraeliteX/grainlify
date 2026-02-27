@@ -530,6 +530,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -608,6 +614,12 @@
                               "val": {
                                 "string": "p-00001"
                               }
+                            },
+                            {
+                              "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
                             },
                             {
                               "key": {
@@ -692,6 +704,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -773,6 +791,12 @@
                             },
                             {
                               "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
+                            },
+                            {
+                              "key": {
                                 "symbol": "remaining_balance"
                               },
                               "val": {
@@ -851,6 +875,12 @@
                               "val": {
                                 "string": "p-00004"
                               }
+                            },
+                            {
+                              "key": {
+                                "symbol": "reference_hash"
+                              },
+                              "val": "void"
                             },
                             {
                               "key": {
@@ -951,11 +981,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "p-00000"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -976,6 +1026,20 @@
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -987,6 +1051,12 @@
                     },
                     {
                       "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "token_address"
                       },
                       "val": {
@@ -1004,6 +1074,20 @@
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -1015,6 +1099,12 @@
                     },
                     {
                       "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "token_address"
                       },
                       "val": {
@@ -1032,6 +1122,20 @@
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {
@@ -1043,6 +1147,12 @@
                     },
                     {
                       "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "token_address"
                       },
                       "val": {
@@ -1063,11 +1173,31 @@
                     },
                     {
                       "key": {
+                        "symbol": "creator"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "initial_liquidity"
+                      },
+                      "val": "void"
+                    },
+                    {
+                      "key": {
                         "symbol": "program_id"
                       },
                       "val": {
                         "string": "p-00004"
                       }
+                    },
+                    {
+                      "key": {
+                        "symbol": "reference_hash"
+                      },
+                      "val": "void"
                     },
                     {
                       "key": {

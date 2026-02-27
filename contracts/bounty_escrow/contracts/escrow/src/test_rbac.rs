@@ -164,7 +164,7 @@ fn test_depositor_permissions() {
     // Signatures: lock_funds(depositor, bounty_id, amount, deadline)
     setup
         .client
-        .lock_funds(&setup.depositor, &bounty_id, &amount, &deadline);
+        .lock_funds(&setup.depositor, &bounty_id, &amount, &deadline, &None);
 }
 
 #[test]
@@ -197,5 +197,5 @@ fn test_random_cannot_lock_funds_for_depositor() {
     let depositor2 = Address::generate(&env2);
 
     // This should panic: no auth mocked, depositor.require_auth() will fail
-    client2.lock_funds(&depositor2, &1u64, &1000i128, &3600);
+    client2.lock_funds(&depositor2, &1u64, &1000i128, &3600, &None);
 }

@@ -72,7 +72,8 @@
                 },
                 {
                   "u64": 30
-                }
+                },
+                "void"
               ]
             }
           },
@@ -127,7 +128,8 @@
                 },
                 {
                   "u64": 31
-                }
+                },
+                "void"
               ]
             }
           },
@@ -182,7 +184,8 @@
                 },
                 {
                   "u64": 32
-                }
+                },
+                "void"
               ]
             }
           },
@@ -237,7 +240,8 @@
                 },
                 {
                   "u64": 33
-                }
+                },
+                "void"
               ]
             }
           },
@@ -292,7 +296,8 @@
                 },
                 {
                   "u64": 34
-                }
+                },
+                "void"
               ]
             }
           },
@@ -347,7 +352,8 @@
                 },
                 {
                   "u64": 35
-                }
+                },
+                "void"
               ]
             }
           },
@@ -402,7 +408,8 @@
                 },
                 {
                   "u64": 36
-                }
+                },
+                "void"
               ]
             }
           },
@@ -457,7 +464,8 @@
                 },
                 {
                   "u64": 37
-                }
+                },
+                "void"
               ]
             }
           },
@@ -512,7 +520,8 @@
                 },
                 {
                   "u64": 38
-                }
+                },
+                "void"
               ]
             }
           },
@@ -567,7 +576,8 @@
                 },
                 {
                   "u64": 39
-                }
+                },
+                "void"
               ]
             }
           },
@@ -622,7 +632,8 @@
                 },
                 {
                   "u64": 40
-                }
+                },
+                "void"
               ]
             }
           },
@@ -677,7 +688,8 @@
                 },
                 {
                   "u64": 41
-                }
+                },
+                "void"
               ]
             }
           },
@@ -732,7 +744,8 @@
                 },
                 {
                   "u64": 42
-                }
+                },
+                "void"
               ]
             }
           },
@@ -787,7 +800,8 @@
                 },
                 {
                   "u64": 43
-                }
+                },
+                "void"
               ]
             }
           },
@@ -842,7 +856,8 @@
                 },
                 {
                   "u64": 44
-                }
+                },
+                "void"
               ]
             }
           },
@@ -897,7 +912,8 @@
                 },
                 {
                   "u64": 45
-                }
+                },
+                "void"
               ]
             }
           },
@@ -952,7 +968,8 @@
                 },
                 {
                   "u64": 46
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1007,7 +1024,8 @@
                 },
                 {
                   "u64": 47
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1062,7 +1080,8 @@
                 },
                 {
                   "u64": 48
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1117,7 +1136,8 @@
                 },
                 {
                   "u64": 49
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1172,7 +1192,8 @@
                 },
                 {
                   "u64": 50
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1227,7 +1248,8 @@
                 },
                 {
                   "u64": 51
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1282,7 +1304,8 @@
                 },
                 {
                   "u64": 52
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1337,7 +1360,8 @@
                 },
                 {
                   "u64": 53
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1392,7 +1416,8 @@
                 },
                 {
                   "u64": 54
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1447,7 +1472,8 @@
                 },
                 {
                   "u64": 55
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1502,7 +1528,8 @@
                 },
                 {
                   "u64": 56
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1557,7 +1584,8 @@
                 },
                 {
                   "u64": 57
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1612,7 +1640,8 @@
                 },
                 {
                   "u64": 58
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1667,7 +1696,8 @@
                 },
                 {
                   "u64": 59
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1722,7 +1752,8 @@
                 },
                 {
                   "u64": 60
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1777,7 +1808,8 @@
                 },
                 {
                   "u64": 61
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1832,7 +1864,8 @@
                 },
                 {
                   "u64": 62
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1887,7 +1920,8 @@
                 },
                 {
                   "u64": 63
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1942,7 +1976,8 @@
                 },
                 {
                   "u64": 64
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1997,7 +2032,8 @@
                 },
                 {
                   "u64": 65
-                }
+                },
+                "void"
               ]
             }
           },
@@ -2052,7 +2088,8 @@
                 },
                 {
                   "u64": 66
-                }
+                },
+                "void"
               ]
             }
           },
@@ -2107,7 +2144,8 @@
                 },
                 {
                   "u64": 67
-                }
+                },
+                "void"
               ]
             }
           },
@@ -2162,7 +2200,8 @@
                 },
                 {
                   "u64": 68
-                }
+                },
+                "void"
               ]
             }
           },
@@ -2217,7 +2256,8 @@
                 },
                 {
                   "u64": 69
-                }
+                },
+                "void"
               ]
             }
           },
@@ -11023,7 +11063,8 @@
                 },
                 {
                   "u64": 30
-                }
+                },
+                "void"
               ]
             }
           }
@@ -11177,6 +11218,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -11245,7 +11294,8 @@
                 },
                 {
                   "u64": 31
-                }
+                },
+                "void"
               ]
             }
           }
@@ -11399,6 +11449,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -11467,7 +11525,8 @@
                 },
                 {
                   "u64": 32
-                }
+                },
+                "void"
               ]
             }
           }
@@ -11621,6 +11680,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -11689,7 +11756,8 @@
                 },
                 {
                   "u64": 33
-                }
+                },
+                "void"
               ]
             }
           }
@@ -11843,6 +11911,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -11911,7 +11987,8 @@
                 },
                 {
                   "u64": 34
-                }
+                },
+                "void"
               ]
             }
           }
@@ -12065,6 +12142,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -12133,7 +12218,8 @@
                 },
                 {
                   "u64": 35
-                }
+                },
+                "void"
               ]
             }
           }
@@ -12287,6 +12373,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -12355,7 +12449,8 @@
                 },
                 {
                   "u64": 36
-                }
+                },
+                "void"
               ]
             }
           }
@@ -12509,6 +12604,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -12577,7 +12680,8 @@
                 },
                 {
                   "u64": 37
-                }
+                },
+                "void"
               ]
             }
           }
@@ -12731,6 +12835,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -12799,7 +12911,8 @@
                 },
                 {
                   "u64": 38
-                }
+                },
+                "void"
               ]
             }
           }
@@ -12953,6 +13066,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -13021,7 +13142,8 @@
                 },
                 {
                   "u64": 39
-                }
+                },
+                "void"
               ]
             }
           }
@@ -13175,6 +13297,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -13243,7 +13373,8 @@
                 },
                 {
                   "u64": 40
-                }
+                },
+                "void"
               ]
             }
           }
@@ -13397,6 +13528,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -13465,7 +13604,8 @@
                 },
                 {
                   "u64": 41
-                }
+                },
+                "void"
               ]
             }
           }
@@ -13619,6 +13759,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -13687,7 +13835,8 @@
                 },
                 {
                   "u64": 42
-                }
+                },
+                "void"
               ]
             }
           }
@@ -13841,6 +13990,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -13909,7 +14066,8 @@
                 },
                 {
                   "u64": 43
-                }
+                },
+                "void"
               ]
             }
           }
@@ -14063,6 +14221,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -14131,7 +14297,8 @@
                 },
                 {
                   "u64": 44
-                }
+                },
+                "void"
               ]
             }
           }
@@ -14285,6 +14452,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -14353,7 +14528,8 @@
                 },
                 {
                   "u64": 45
-                }
+                },
+                "void"
               ]
             }
           }
@@ -14507,6 +14683,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -14575,7 +14759,8 @@
                 },
                 {
                   "u64": 46
-                }
+                },
+                "void"
               ]
             }
           }
@@ -14729,6 +14914,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -14797,7 +14990,8 @@
                 },
                 {
                   "u64": 47
-                }
+                },
+                "void"
               ]
             }
           }
@@ -14951,6 +15145,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -15019,7 +15221,8 @@
                 },
                 {
                   "u64": 48
-                }
+                },
+                "void"
               ]
             }
           }
@@ -15173,6 +15376,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -15241,7 +15452,8 @@
                 },
                 {
                   "u64": 49
-                }
+                },
+                "void"
               ]
             }
           }
@@ -15395,6 +15607,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -15463,7 +15683,8 @@
                 },
                 {
                   "u64": 50
-                }
+                },
+                "void"
               ]
             }
           }
@@ -15617,6 +15838,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -15685,7 +15914,8 @@
                 },
                 {
                   "u64": 51
-                }
+                },
+                "void"
               ]
             }
           }
@@ -15839,6 +16069,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -15907,7 +16145,8 @@
                 },
                 {
                   "u64": 52
-                }
+                },
+                "void"
               ]
             }
           }
@@ -16061,6 +16300,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -16129,7 +16376,8 @@
                 },
                 {
                   "u64": 53
-                }
+                },
+                "void"
               ]
             }
           }
@@ -16283,6 +16531,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -16351,7 +16607,8 @@
                 },
                 {
                   "u64": 54
-                }
+                },
+                "void"
               ]
             }
           }
@@ -16505,6 +16762,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -16573,7 +16838,8 @@
                 },
                 {
                   "u64": 55
-                }
+                },
+                "void"
               ]
             }
           }
@@ -16727,6 +16993,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -16795,7 +17069,8 @@
                 },
                 {
                   "u64": 56
-                }
+                },
+                "void"
               ]
             }
           }
@@ -16949,6 +17224,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -17017,7 +17300,8 @@
                 },
                 {
                   "u64": 57
-                }
+                },
+                "void"
               ]
             }
           }
@@ -17171,6 +17455,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -17239,7 +17531,8 @@
                 },
                 {
                   "u64": 58
-                }
+                },
+                "void"
               ]
             }
           }
@@ -17393,6 +17686,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -17461,7 +17762,8 @@
                 },
                 {
                   "u64": 59
-                }
+                },
+                "void"
               ]
             }
           }
@@ -17615,6 +17917,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -17683,7 +17993,8 @@
                 },
                 {
                   "u64": 60
-                }
+                },
+                "void"
               ]
             }
           }
@@ -17837,6 +18148,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -17905,7 +18224,8 @@
                 },
                 {
                   "u64": 61
-                }
+                },
+                "void"
               ]
             }
           }
@@ -18059,6 +18379,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -18127,7 +18455,8 @@
                 },
                 {
                   "u64": 62
-                }
+                },
+                "void"
               ]
             }
           }
@@ -18281,6 +18610,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -18349,7 +18686,8 @@
                 },
                 {
                   "u64": 63
-                }
+                },
+                "void"
               ]
             }
           }
@@ -18503,6 +18841,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -18571,7 +18917,8 @@
                 },
                 {
                   "u64": 64
-                }
+                },
+                "void"
               ]
             }
           }
@@ -18725,6 +19072,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -18793,7 +19148,8 @@
                 },
                 {
                   "u64": 65
-                }
+                },
+                "void"
               ]
             }
           }
@@ -18947,6 +19303,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -19015,7 +19379,8 @@
                 },
                 {
                   "u64": 66
-                }
+                },
+                "void"
               ]
             }
           }
@@ -19169,6 +19534,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -19237,7 +19610,8 @@
                 },
                 {
                   "u64": 67
-                }
+                },
+                "void"
               ]
             }
           }
@@ -19391,6 +19765,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -19459,7 +19841,8 @@
                 },
                 {
                   "u64": 68
-                }
+                },
+                "void"
               ]
             }
           }
@@ -19613,6 +19996,14 @@
                 },
                 {
                   "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
+                  }
+                },
+                {
+                  "key": {
                     "symbol": "version"
                   },
                   "val": {
@@ -19681,7 +20072,8 @@
                 },
                 {
                   "u64": 69
-                }
+                },
+                "void"
               ]
             }
           }
@@ -19831,6 +20223,14 @@
                   },
                   "val": {
                     "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                  }
+                },
+                {
+                  "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
                   }
                 },
                 {

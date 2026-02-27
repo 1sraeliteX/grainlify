@@ -229,7 +229,7 @@ fn test_batch_payout_blocks_reentrancy() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &total_amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &total_amount);
     client.lock_program_funds(&total_amount);
 
@@ -265,7 +265,7 @@ fn test_cross_function_reentrancy_single_to_batch() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &amount);
     client.lock_program_funds(&amount);
 
@@ -297,7 +297,7 @@ fn test_cross_function_reentrancy_batch_to_single() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &amount);
     client.lock_program_funds(&amount);
 
@@ -331,7 +331,7 @@ fn test_trigger_releases_normal_execution() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &amount);
     client.lock_program_funds(&amount);
 
@@ -367,7 +367,7 @@ fn test_trigger_releases_blocks_reentrancy() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &amount);
     client.lock_program_funds(&amount);
 
@@ -409,7 +409,7 @@ fn test_multiple_sequential_payouts_succeed() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &total_amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &total_amount);
     client.lock_program_funds(&total_amount);
 
@@ -449,7 +449,7 @@ fn test_guard_cleared_after_successful_payout() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &amount);
     client.lock_program_funds(&amount);
 
@@ -484,7 +484,7 @@ fn test_guard_state_across_multiple_operations() {
     let token_admin = token::StellarAssetClient::new(&env, &token_client.address);
     token_admin.mint(&authorized_key, &total_amount);
 
-    client.init_program(&program_id, &authorized_key, &token_client.address);
+    client.init_program(&program_id, &authorized_key, &token_client.address, &admin.clone(, &None, &None), &None, &None);
     token_client.transfer(&authorized_key, &contract_id, &total_amount);
     client.lock_program_funds(&total_amount);
 

@@ -74,7 +74,8 @@
                 },
                 {
                   "u64": 86400
-                }
+                },
+                "void"
               ]
             }
           },
@@ -1764,7 +1765,8 @@
                 },
                 {
                   "u64": 86400
-                }
+                },
+                "void"
               ]
             }
           }
@@ -1793,7 +1795,7 @@
             "data": {
               "vec": [
                 {
-                  "bytes": "bdc27e8d0dfc7fa48ff0b18253a6fbb35817f95cddb1e05fb7c30d1edca07d8c"
+                  "bytes": "d851604fd2ec6d598e5d5edc0d29bb7dfa3ebd8501e7a7b946124486ddb9c35c"
                 },
                 "void",
                 {
@@ -1825,7 +1827,8 @@
                                   },
                                   {
                                     "u64": 86400
-                                  }
+                                  },
+                                  "void"
                                 ]
                               }
                             },
@@ -2069,6 +2072,14 @@
                   },
                   "val": {
                     "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  }
+                },
+                {
+                  "key": {
+                    "symbol": "non_transferable_rewards"
+                  },
+                  "val": {
+                    "bool": false
                   }
                 },
                 {

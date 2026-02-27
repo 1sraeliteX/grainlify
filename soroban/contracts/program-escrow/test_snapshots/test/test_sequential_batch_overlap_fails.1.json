@@ -299,6 +299,18 @@
                     },
                     {
                       "key": {
+                        "symbol": "jurisdiction"
+                      },
+                      "val": {
+                        "vec": [
+                          {
+                            "symbol": "None"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "key": {
                         "symbol": "name"
                       },
                       "val": {

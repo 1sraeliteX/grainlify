@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+# Use rlib only to avoid Windows "export ordinal too large" when this crate
+# is built as a dependency for host targets (e.g. tests). Build the WASM contract
+# via a dedicated contract crate or: cargo build -p grainlify-core --target wasm32-unknown-unknown
+# with cdylib added back if needed for deployment.
+crate-type = ["rlib"]
 
 [features]
 default = ["contract"]
@@ -19,6 +23,7 @@ soroban-sdk = "21.0.0"
 soroban-sdk = { version = "21.0.0", features = ["testutils"] }
 
 [profile.release]
+overflow-checks = true
 opt-level = "z"
 lto = true
 codegen-units = 1

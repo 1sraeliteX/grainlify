@@ -64,6 +64,15 @@ type Config struct {
 	EscrowContractID         string
 	ProgramEscrowContractID  string
 	TokenContractID          string
+
+	// Sandbox mode: mirrors selected contract operations to separate sandbox
+	// contract instances for testing new features against real-ish data.
+	SandboxEnabled                 bool
+	SandboxEscrowContractID        string // Sandbox escrow contract address
+	SandboxProgramEscrowContractID string // Sandbox program escrow contract address
+	SandboxShadowedOperations      string // Comma-separated operations to shadow (e.g. "lock_funds,release_funds")
+	SandboxSourceSecret            string // Separate keypair for sandbox transactions
+	SandboxMaxConcurrentShadows    int    // Max concurrent shadow goroutines (default: 10)
 }
 
 func Load() Config {
@@ -123,6 +132,14 @@ func Load() Config {
 		EscrowContractID:         getEnv("ESCROW_CONTRACT_ID", ""),
 		ProgramEscrowContractID:  getEnv("PROGRAM_ESCROW_CONTRACT_ID", ""),
 		TokenContractID:          getEnv("TOKEN_CONTRACT_ID", ""),
+
+		// Sandbox mode
+		SandboxEnabled:                 getEnvBool("SANDBOX_ENABLED", false),
+		SandboxEscrowContractID:        getEnv("SANDBOX_ESCROW_CONTRACT_ID", ""),
+		SandboxProgramEscrowContractID: getEnv("SANDBOX_PROGRAM_ESCROW_CONTRACT_ID", ""),
+		SandboxShadowedOperations:      getEnv("SANDBOX_SHADOWED_OPERATIONS", "lock_funds,release_funds,refund,single_payout,batch_payout"),
+		SandboxSourceSecret:            getEnv("SANDBOX_SOURCE_SECRET", ""),
+		SandboxMaxConcurrentShadows:    getEnvInt("SANDBOX_MAX_CONCURRENT_SHADOWS", 10),
 	}
 }
 
@@ -151,6 +168,18 @@ func getEnv(key, fallback string) string {
 		return fallback
 	}
 	return v
+}
+
+func getEnvInt(key string, fallback int) int {
+	v := strings.TrimSpace(os.Getenv(key))
+	if v == "" {
+		return fallback
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil {
+		return fallback
+	}
+	return n
 }
 
 func getEnvBool(key string, fallback bool) bool {
