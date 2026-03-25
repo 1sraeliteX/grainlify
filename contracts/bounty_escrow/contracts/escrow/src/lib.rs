@@ -4373,6 +4373,19 @@ impl BountyEscrowContract {
         reentrancy_guard::release(&env);
         result
     }
+    /// Update stored metadata for a bounty.
+    ///
+    /// # Arguments
+    /// * `env` - Contract environment
+    /// * `_admin` - Admin address (auth enforced against stored admin)
+    /// * `bounty_id` - Bounty identifier
+    /// * `repo_id` - Repository identifier
+    /// * `issue_id` - Issue identifier
+    /// * `bounty_type` - Human-readable bounty type tag (1..=50 chars)
+    /// * `reference_hash` - Optional reference hash for off-chain metadata
+    ///
+    /// # Panics
+    /// Panics if `bounty_type` is empty or exceeds the maximum length.
     pub fn update_metadata(
         env: Env,
         _admin: Address,
@@ -4388,6 +4401,8 @@ impl BountyEscrowContract {
             .get(&DataKey::Admin)
             .ok_or(Error::NotInitialized)?;
         stored_admin.require_auth();
+
+        validation::validate_tag(&env, &bounty_type, "bounty_type");
 
         let (existing_flags, existing_prefs) = env
             .storage()

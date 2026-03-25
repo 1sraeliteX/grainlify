@@ -84,3 +84,46 @@ fn test_notification_preferences_set_and_event() {
     assert_eq!(data.created, true);
     assert_eq!(data.timestamp, 500);
 }
+
+#[test]
+#[should_panic(expected = "bounty_type exceeds maximum length of 50 characters")]
+fn test_metadata_rejects_oversized_bounty_type() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, BountyEscrowContract);
+    let client = BountyEscrowContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    let token = Address::generate(&env);
+    client.init(&admin, &token);
+
+    let bounty_id = 2u64;
+    let repo_id = 111u64;
+    let issue_id = 222u64;
+    let long_tag = "a".repeat(51);
+    let bounty_type = String::from_str(&env, &long_tag);
+
+    client.update_metadata(&admin, &bounty_id, &repo_id, &issue_id, &bounty_type, &None);
+}
+
+#[test]
+#[should_panic(expected = "bounty_type cannot be empty")]
+fn test_metadata_rejects_empty_bounty_type() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, BountyEscrowContract);
+    let client = BountyEscrowContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    let token = Address::generate(&env);
+    client.init(&admin, &token);
+
+    let bounty_id = 3u64;
+    let repo_id = 333u64;
+    let issue_id = 444u64;
+    let bounty_type = String::from_str(&env, "");
+
+    client.update_metadata(&admin, &bounty_id, &repo_id, &issue_id, &bounty_type, &None);
+}

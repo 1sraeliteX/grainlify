@@ -10,6 +10,12 @@ The escrow contract provides read-only dry-run entrypoints for previewing operat
 
 All return `SimulationResult` with success/error_code/amount/resulting_status/remaining_amount. No authorization required.
 
+## Metadata Constraints
+
+The escrow metadata API enforces validation rules for human-readable tags like
+`bounty_type`. See `contracts/escrow/METADATA_CONSTRAINTS.md` for the current
+limits and guidance.
+
 ---
 
 # Soroban Project

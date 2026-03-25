@@ -115,6 +115,14 @@ fn test_issue_claim_ticket_deterministic_issues_for_derived_winner() {
     let expires_at = s.env.ledger().timestamp() + 500;
     let claim_amount = 10_000i128;
 
+    let derived_winner = s.client.derive_claim_ticket_winner(
+        &bounty_id,
+        &candidates,
+        &claim_amount,
+        &expires_at,
+        &seed,
+    );
+
     let ticket_id = s.client.issue_claim_ticket_deterministic(
         &bounty_id,
         &candidates,
