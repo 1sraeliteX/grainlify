@@ -34,8 +34,14 @@ macro_rules! setup_search {
 #[test]
 fn test_search_empty_contract() {
     setup_search!(
-        env, client, _contract_id, _admin, _program_admin,
-        _token_client, _token_admin, 0i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        _program_admin,
+        _token_client,
+        _token_admin,
+        0i128
     );
 
     let criteria = ProgramSearchCriteria {
@@ -54,8 +60,14 @@ fn test_search_empty_contract() {
 #[test]
 fn test_search_lists_all_programs() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     for id in 1..=5u64 {
@@ -83,8 +95,14 @@ fn test_search_lists_all_programs() {
 #[test]
 fn test_search_pagination_basic() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     for id in 1..=5u64 {
@@ -129,8 +147,14 @@ fn test_search_pagination_basic() {
 #[test]
 fn test_search_filter_by_status() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     // Register 3 programs — all Active by default
@@ -163,8 +187,14 @@ fn test_search_filter_by_status() {
 #[test]
 fn test_search_filter_by_status_and_admin_together() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        token_admin,
+        100_000i128
     );
 
     let other_admin = Address::generate(&env);
@@ -205,8 +235,14 @@ fn test_search_filter_by_status_and_admin_together() {
 #[test]
 fn test_search_filter_by_admin() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        token_admin,
+        100_000i128
     );
 
     let other_admin = Address::generate(&env);
@@ -257,8 +293,14 @@ fn test_search_filter_by_admin() {
 #[test]
 fn test_search_page_size_cap() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 1_000_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        1_000_000i128
     );
 
     // Create 25 programs
@@ -286,8 +328,14 @@ fn test_search_page_size_cap() {
 #[test]
 fn test_search_zero_limit_defaults_to_max_page_size() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 1_000_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        1_000_000i128
     );
 
     for id in 1..=25u64 {
@@ -313,8 +361,14 @@ fn test_search_zero_limit_defaults_to_max_page_size() {
 #[test]
 fn test_search_unknown_cursor_returns_empty_page() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     for id in 1..=3u64 {
@@ -340,31 +394,27 @@ fn test_search_unknown_cursor_returns_empty_page() {
 #[test]
 fn test_search_cursor_skips_non_matching_records() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        token_admin,
+        100_000i128
     );
 
     let other_admin = Address::generate(&env);
     token_admin.mint(&other_admin, &100_000);
 
-    client.register_program(
-        &1,
-        &other_admin,
-        &String::from_str(&env, "Other A"),
-        &1_000,
-    );
+    client.register_program(&1, &other_admin, &String::from_str(&env, "Other A"), &1_000);
     client.register_program(
         &2,
         &program_admin,
         &String::from_str(&env, "Mine A"),
         &1_000,
     );
-    client.register_program(
-        &3,
-        &other_admin,
-        &String::from_str(&env, "Other B"),
-        &1_000,
-    );
+    client.register_program(&3, &other_admin, &String::from_str(&env, "Other B"), &1_000);
     client.register_program(
         &4,
         &program_admin,
@@ -395,8 +445,14 @@ fn test_search_cursor_skips_non_matching_records() {
 #[test]
 fn test_search_batch_registered_programs() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     let items = vec![
@@ -438,8 +494,14 @@ fn test_search_batch_registered_programs() {
 #[test]
 fn test_search_includes_jurisdiction_enabled_programs() {
     setup_search!(
-        env, client, _contract_id, _admin, program_admin,
-        _token_client, _token_admin, 100_000i128
+        env,
+        client,
+        _contract_id,
+        _admin,
+        program_admin,
+        _token_client,
+        _token_admin,
+        100_000i128
     );
 
     let jurisdiction = ProgramJurisdictionConfig {

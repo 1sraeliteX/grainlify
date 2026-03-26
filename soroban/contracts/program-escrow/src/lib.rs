@@ -17,8 +17,8 @@
 //! - cursor pagination keeps results reviewable and avoids hidden full scans
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env,
-    String, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env, String,
+    Vec,
 };
 
 const MAX_BATCH_SIZE: u32 = 20;
@@ -325,7 +325,9 @@ impl ProgramEscrowContract {
             .get(&DataKey::ProgramIndex)
             .unwrap_or_else(|| Vec::new(env));
         index.push_back(program_id);
-        env.storage().persistent().set(&DataKey::ProgramIndex, &index);
+        env.storage()
+            .persistent()
+            .set(&DataKey::ProgramIndex, &index);
     }
 
     fn store_program(env: &Env, program_id: u64, program: &Program) {
@@ -589,11 +591,7 @@ impl ProgramEscrowContract {
                 item.juris_registration_paused,
                 item.jurisdiction.clone(),
             );
-            Self::enforce_jurisdiction_rules(
-                &jurisdiction,
-                item.total_funding,
-                item.kyc_attested,
-            )?;
+            Self::enforce_jurisdiction_rules(&jurisdiction, item.total_funding, item.kyc_attested)?;
 
             let mut count = 0u32;
             for other in items.iter() {
@@ -685,7 +683,9 @@ impl ProgramEscrowContract {
             deprecated,
             migration_target: migration_target.clone(),
         };
-        env.storage().instance().set(&DataKey::DeprecationState, &state);
+        env.storage()
+            .instance()
+            .set(&DataKey::DeprecationState, &state);
         env.events().publish(
             (symbol_short!("deprec"),),
             (
@@ -707,7 +707,11 @@ impl ProgramEscrowContract {
         env: Env,
         program_id: u64,
     ) -> Result<Option<ProgramJurisdictionConfig>, Error> {
-        if !env.storage().persistent().has(&DataKey::Program(program_id)) {
+        if !env
+            .storage()
+            .persistent()
+            .has(&DataKey::Program(program_id))
+        {
             return Err(Error::ProgramNotFound);
         }
         Ok(env

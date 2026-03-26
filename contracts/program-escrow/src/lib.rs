@@ -139,7 +139,6 @@
 //! 5. **Balance Checks**: Verify remaining balance matches expectations
 //! 6. **Token Approval**: Ensure contract has token allowance before locking funds
 
-#![no_std]
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, token, vec, Address, Env,
     String, Symbol, Vec,
@@ -168,6 +167,7 @@ const NEXT_SCHEDULE_ID: Symbol = symbol_short!("NxtSched");
 const PROGRAM_INDEX: Symbol = symbol_short!("ProgIdx");
 const AUTH_KEY_INDEX: Symbol = symbol_short!("AuthIdx");
 const FEE_CONFIG: Symbol = symbol_short!("FeeCfg");
+const FEE_COLLECTED: Symbol = symbol_short!("FeeCol");
 
 // Fee rate is stored in basis points (1 basis point = 0.01%)
 // Example: 100 basis points = 1%, 1000 basis points = 10%
@@ -182,10 +182,24 @@ pub const RISK_FLAG_DEPRECATED: u32 = 1 << 3;
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct FeeConfig {
-    pub lock_fee_rate: i128,    // Fee rate for lock operations (basis points)
-    pub payout_fee_rate: i128,  // Fee rate for payout operations (basis points)
+    pub lock_fee_rate: i128, // Fee rate for lock operations (basis points)
+    pub payout_fee_rate: i128, // Fee rate for each payout (basis points of gross payout)
+    pub lock_fixed_fee: i128, // Flat fee on lock (token units), capped to lock amount
+    pub payout_fixed_fee: i128, // Flat fee per payout (token units), capped to gross payout
     pub fee_recipient: Address, // Address to receive fees
-    pub fee_enabled: bool,      // Global fee enable/disable flag
+    pub fee_enabled: bool,    // Global fee enable/disable flag
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct FeeCollectedEvent {
+    pub version: u32,
+    pub operation: Symbol,
+    pub fee_amount: i128,
+    pub fee_rate_bps: i128,
+    pub fee_fixed: i128,
+    pub recipient: Address,
+    pub timestamp: u64,
 }
 // ==================== MONITORING MODULE ====================
 mod monitoring {
@@ -257,7 +271,7 @@ mod monitoring {
     }
 
     // Track operation
-    pub fn track_operation(env: &Env, operation: Symbol, caller: Address, success: bool) {
+    pub fn track_operation(env: &Env, _operation: Symbol, _caller: Address, success: bool) {
         let key = Symbol::new(env, OPERATION_COUNT);
         let count: u64 = env.storage().persistent().get(&key).unwrap_or(0);
         env.storage().persistent().set(&key, &(count + 1));
@@ -460,7 +474,7 @@ pub enum DataKey {
     ReleaseHistory(String),          // program_id -> Vec<ProgramReleaseHistory>
     NextScheduleId(String),          // program_id -> next schedule_id
     MultisigConfig(String),          // program_id -> MultisigConfig
-    SplitConfig(String),             // program_id -> SplitConfig
+    SplitConfig(String),             // program_id -> SplitConfig (payout splits)
     PayoutApproval(String, Address), // program_id, recipient -> PayoutApproval
     PendingClaim(String, u64),       // (program_id, schedule_id) -> ClaimRecord
     ClaimWindow,                     // u64 seconds (global config)
@@ -527,6 +541,40 @@ pub struct Analytics {
     pub total_payouts: u32,
     pub active_programs: u32,
     pub operation_count: u32,
+}
+
+/// Program reputation metrics tracking performance and reliability.
+/// Includes counts of payouts and schedules, funds tracking, and performance scores in basis points.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ProgramReputation {
+    /// Total number of direct payouts executed
+    pub total_payouts: u32,
+    /// Total number of release schedules created
+    pub total_scheduled: u32,
+    /// Number of schedules successfully released
+    pub completed_releases: u32,
+    /// Number of schedules awaiting release
+    pub pending_releases: u32,
+    /// Number of schedules past their release timestamp (not yet released)
+    pub overdue_releases: u32,
+    /// Count of disputes (reserved for future use)
+    pub dispute_count: u32,
+    /// Count of refunds (reserved for future use)
+    pub refund_count: u32,
+    /// Total funds locked in escrow
+    pub total_funds_locked: i128,
+    /// Total funds distributed via payouts
+    pub total_funds_distributed: i128,
+    /// Completion rate: (completed_releases / total_scheduled) * 10_000, capped at 10_000
+    /// Defaults to 10_000 if no schedules exist
+    pub completion_rate_bps: u32,
+    /// Payout fulfillment rate: (total_funds_distributed / total_funds_locked) * 10_000
+    /// Defaults to 0 if no funds locked, capped at 10_000
+    pub payout_fulfillment_rate_bps: u32,
+    /// Overall reputation score in basis points (0-10_000)
+    /// Returns 0 if any overdue releases exist (reputation penalty for overdue milestones)
+    pub overall_score_bps: u32,
 }
 
 #[contracttype]
@@ -700,7 +748,6 @@ mod reentrancy_guard_standalone_test;
 mod malicious_reentrant;
 
 #[cfg(test)]
-#[cfg(any())]
 mod test_granular_pause;
 
 #[cfg(test)]
@@ -783,6 +830,20 @@ impl ProgramEscrowContract {
             panic!("Program already initialized");
         }
 
+        if !env.storage().instance().has(&FEE_CONFIG) {
+            env.storage().instance().set(
+                &FEE_CONFIG,
+                &FeeConfig {
+                    lock_fee_rate: 0,
+                    payout_fee_rate: 0,
+                    lock_fixed_fee: 0,
+                    payout_fixed_fee: 0,
+                    fee_recipient: env.current_contract_address(),
+                    fee_enabled: false,
+                },
+            );
+        }
+
         let mut total_funds = 0i128;
         let mut remaining_balance = 0i128;
         let mut init_liquidity = 0i128;
@@ -794,9 +855,32 @@ impl ProgramEscrowContract {
                 let token_client = token::Client::new(&env, &token_address);
                 creator.require_auth();
                 token_client.transfer(&creator, &contract_address, &amount);
-                total_funds = amount;
-                remaining_balance = amount;
-                init_liquidity = amount;
+
+                let cfg = Self::get_fee_config_internal(&env);
+                let fee = Self::combined_fee_amount(
+                    amount,
+                    cfg.lock_fee_rate,
+                    cfg.lock_fixed_fee,
+                    cfg.fee_enabled,
+                );
+                let net = amount.checked_sub(fee).unwrap_or(0);
+                if net <= 0 {
+                    panic!("Lock fee consumes entire initial liquidity");
+                }
+                if fee > 0 {
+                    token_client.transfer(&contract_address, &cfg.fee_recipient, &fee);
+                    Self::emit_fee_collected(
+                        &env,
+                        symbol_short!("lock"),
+                        fee,
+                        cfg.lock_fee_rate,
+                        cfg.lock_fixed_fee,
+                        cfg.fee_recipient.clone(),
+                    );
+                }
+                total_funds = net;
+                remaining_balance = net;
+                init_liquidity = net;
             }
         }
 
@@ -829,6 +913,18 @@ impl ProgramEscrowContract {
 
         // Store program data
         env.storage().instance().set(&PROGRAM_DATA, &program_data);
+
+        if !env.storage().instance().has(&FEE_CONFIG) {
+            env.storage().instance().set(
+                &FEE_CONFIG,
+                &FeeConfig {
+                    lock_fee_rate: 0,
+                    payout_fee_rate: 0,
+                    fee_recipient: authorized_payout_key.clone(),
+                    fee_enabled: false,
+                },
+            );
+        }
 
         // Fallback for legacy tests: if admin not set, set it to authorized_payout_key
         if !env.storage().instance().has(&DataKey::Admin) {
@@ -888,7 +984,7 @@ impl ProgramEscrowContract {
         // Apply rate limiting
         anti_abuse::check_rate_limit(&env, authorized_payout_key.clone());
 
-        let start = env.ledger().timestamp();
+        let _start = env.ledger().timestamp();
         let caller = authorized_payout_key.clone();
 
         // Validate program_id (basic length check)
@@ -979,6 +1075,8 @@ impl ProgramEscrowContract {
                 let fee_config = FeeConfig {
                     lock_fee_rate: 0,
                     payout_fee_rate: 0,
+                    lock_fixed_fee: 0,
+                    payout_fixed_fee: 0,
                     fee_recipient: authorized_payout_key.clone(),
                     fee_enabled: false,
                 };
@@ -1006,16 +1104,58 @@ impl ProgramEscrowContract {
         Ok(batch_size as u32)
     }
 
-    /// Calculate fee amount based on rate (in basis points)
+    /// Fee from basis points using ceiling division (matches bounty escrow).
     fn calculate_fee(amount: i128, fee_rate: i128) -> i128 {
-        if fee_rate == 0 {
+        if fee_rate == 0 || amount == 0 {
             return 0;
         }
-        // Fee = (amount * fee_rate) / BASIS_POINTS
-        amount
+        let numerator = amount
             .checked_mul(fee_rate)
-            .and_then(|x| x.checked_div(BASIS_POINTS))
-            .unwrap_or(0)
+            .and_then(|x| x.checked_add(BASIS_POINTS - 1))
+            .unwrap_or(0);
+        if numerator == 0 {
+            return 0;
+        }
+        numerator / BASIS_POINTS
+    }
+
+    /// Percentage + fixed fee, capped to `amount`.
+    fn combined_fee_amount(
+        amount: i128,
+        rate_bps: i128,
+        fixed: i128,
+        fee_enabled: bool,
+    ) -> i128 {
+        if !fee_enabled || amount <= 0 || fixed < 0 {
+            return 0;
+        }
+        let pct = Self::calculate_fee(amount, rate_bps);
+        pct.saturating_add(fixed).min(amount).max(0)
+    }
+
+    fn emit_fee_collected(
+        env: &Env,
+        operation: Symbol,
+        fee_amount: i128,
+        fee_rate_bps: i128,
+        fee_fixed: i128,
+        recipient: Address,
+    ) {
+        if fee_amount <= 0 {
+            return;
+        }
+        env.events().publish(
+            (FEE_COLLECTED,),
+            FeeCollectedEvent {
+                version: EVENT_VERSION_V2,
+                operation,
+                fee_amount,
+                fee_rate_bps,
+                fee_fixed,
+                recipient,
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 
     /// Get fee configuration (internal helper)
@@ -1026,90 +1166,61 @@ impl ProgramEscrowContract {
             .unwrap_or_else(|| FeeConfig {
                 lock_fee_rate: 0,
                 payout_fee_rate: 0,
+                lock_fixed_fee: 0,
+                payout_fixed_fee: 0,
                 fee_recipient: env.current_contract_address(),
                 fee_enabled: false,
             })
     }
 
-    /// Set the lock fee rate (admin-only).
-    ///
-    /// # Arguments
-    /// * `rate` - Fee rate in basis points (1 bp = 0.01%, max 50%)
-    pub fn set_lock_fee_rate(env: Env, rate: i128) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-        admin.require_auth();
-
-        if rate > token_math::MAX_FEE_RATE {
-            panic!("Fee rate exceeds maximum allowed");
-        }
-
-        let mut config = Self::get_fee_config_internal(&env);
-        config.lock_fee_rate = rate;
-        env.storage().instance().set(&FEE_CONFIG, &config);
-    }
-
-    /// Set the payout fee rate (admin-only).
-    ///
-    /// # Arguments
-    /// * `rate` - Fee rate in basis points (1 bp = 0.01%, max 50%)
-    pub fn set_payout_fee_rate(env: Env, rate: i128) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-        admin.require_auth();
-
-        if rate > token_math::MAX_FEE_RATE {
-            panic!("Fee rate exceeds maximum allowed");
-        }
-
-        let mut config = Self::get_fee_config_internal(&env);
-        config.payout_fee_rate = rate;
-        env.storage().instance().set(&FEE_CONFIG, &config);
-    }
-
-    /// Set the fee recipient address (admin-only).
-    ///
-    /// # Arguments
-    /// * `recipient` - Address to receive collected fees
-    pub fn set_fee_recipient(env: Env, recipient: Address) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-        admin.require_auth();
-
-        let mut config = Self::get_fee_config_internal(&env);
-        config.fee_recipient = recipient;
-        env.storage().instance().set(&FEE_CONFIG, &config);
-    }
-
-    /// Enable or disable fee collection (admin-only).
-    ///
-    /// # Arguments
-    /// * `enabled` - True to enable fee collection, false to disable
-    pub fn set_fees_enabled(env: Env, enabled: bool) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-        admin.require_auth();
-
-        let mut config = Self::get_fee_config_internal(&env);
-        config.fee_enabled = enabled;
-        env.storage().instance().set(&FEE_CONFIG, &config);
-    }
-
-    /// Get current fee configuration (public).
+    /// Read fee configuration (view).
     pub fn get_fee_config(env: Env) -> FeeConfig {
         Self::get_fee_config_internal(&env)
+    }
+
+    /// Update fee parameters (admin only). `None` leaves a field unchanged.
+    pub fn update_fee_config(
+        env: Env,
+        lock_fee_rate: Option<i128>,
+        payout_fee_rate: Option<i128>,
+        lock_fixed_fee: Option<i128>,
+        payout_fixed_fee: Option<i128>,
+        fee_recipient: Option<Address>,
+        fee_enabled: Option<bool>,
+    ) {
+        Self::require_admin(&env);
+        let mut cfg = Self::get_fee_config_internal(&env);
+        if let Some(r) = lock_fee_rate {
+            if !(0..=MAX_FEE_RATE).contains(&r) {
+                panic!("Invalid lock fee rate");
+            }
+            cfg.lock_fee_rate = r;
+        }
+        if let Some(r) = payout_fee_rate {
+            if !(0..=MAX_FEE_RATE).contains(&r) {
+                panic!("Invalid payout fee rate");
+            }
+            cfg.payout_fee_rate = r;
+        }
+        if let Some(f) = lock_fixed_fee {
+            if f < 0 {
+                panic!("Invalid lock fixed fee");
+            }
+            cfg.lock_fixed_fee = f;
+        }
+        if let Some(f) = payout_fixed_fee {
+            if f < 0 {
+                panic!("Invalid payout fixed fee");
+            }
+            cfg.payout_fixed_fee = f;
+        }
+        if let Some(a) = fee_recipient {
+            cfg.fee_recipient = a;
+        }
+        if let Some(e) = fee_enabled {
+            cfg.fee_enabled = e;
+        }
+        env.storage().instance().set(&FEE_CONFIG, &cfg);
     }
 
     /// Check if a program exists (legacy single-program check)
@@ -1169,7 +1280,7 @@ impl ProgramEscrowContract {
 
         // Get fee configuration
         let fee_config = Self::get_fee_config_internal(&env);
-        
+
         // Calculate fees if enabled
         let (fee_amount, net_amount) = if fee_config.fee_enabled && fee_config.lock_fee_rate > 0 {
             let (fee, net) = token_math::split_amount(amount, fee_config.lock_fee_rate);
@@ -1178,22 +1289,29 @@ impl ProgramEscrowContract {
             (0i128, amount)
         };
 
-        // Transfer fee to recipient if fee > 0
-        if fee_amount > 0 {
-            let contract_address = env.current_contract_address();
-            let token_client = token::Client::new(&env, &program_data.token_address);
-            token_client.transfer(&contract_address, &fee_config.fee_recipient, &fee_amount);
+        let contract_address = env.current_contract_address();
+        let token_client = token::Client::new(&env, &program_data.token_address);
+        if fee > 0 {
+            token_client.transfer(&contract_address, &cfg.fee_recipient, &fee);
+            Self::emit_fee_collected(
+                &env,
+                symbol_short!("lock"),
+                fee,
+                cfg.lock_fee_rate,
+                cfg.lock_fixed_fee,
+                cfg.fee_recipient.clone(),
+            );
         }
 
-        // Update balances with overflow safety
+        // Credit net amount to program accounting (gross `amount` should already be on contract balance)
         program_data.total_funds = program_data
             .total_funds
-            .checked_add(amount)
+            .checked_add(net)
             .unwrap_or_else(|| panic!("Total funds overflow"));
-        
+
         program_data.remaining_balance = program_data
             .remaining_balance
-            .checked_add(net_amount)
+            .checked_add(net)
             .unwrap_or_else(|| panic!("Remaining balance overflow"));
 
         // Store updated data
@@ -1205,7 +1323,7 @@ impl ProgramEscrowContract {
             FundsLockedEvent {
                 version: EVENT_VERSION_V2,
                 program_id: program_data.program_id.clone(),
-                amount,
+                amount: net,
                 remaining_balance: program_data.remaining_balance,
             },
         );
@@ -1744,28 +1862,45 @@ impl ProgramEscrowContract {
         let timestamp = env.ledger().timestamp();
         let contract_address = env.current_contract_address();
         let token_client = token::Client::new(&env, &program_data.token_address);
+        let cfg = Self::get_fee_config_internal(&env);
 
         for i in 0..recipients.len() {
-            let recipient = recipients.get(i).unwrap();
-            let amount = amounts.get(i).unwrap();
+            let recipient = recipients.get(i).unwrap().clone();
+            let gross = *amounts.get(i).unwrap();
 
-            // Transfer funds from contract to recipient
-            token_client.transfer(&contract_address, &recipient, &amount);
+            let pay_fee = Self::combined_fee_amount(
+                gross,
+                cfg.payout_fee_rate,
+                cfg.payout_fixed_fee,
+                cfg.fee_enabled,
+            );
+            let net = gross.checked_sub(pay_fee).unwrap_or(0);
+            if net <= 0 {
+                reentrancy_guard::clear_entered(&env);
+                panic!("Payout fee consumes entire payout");
+            }
 
-            // Record success for circuit breaker and threshold monitor
+            if pay_fee > 0 {
+                token_client.transfer(&contract_address, &cfg.fee_recipient, &pay_fee);
+                Self::emit_fee_collected(
+                    &env,
+                    symbol_short!("payout"),
+                    pay_fee,
+                    cfg.payout_fee_rate,
+                    cfg.payout_fixed_fee,
+                    cfg.fee_recipient.clone(),
+                );
+            }
+
+            token_client.transfer(&contract_address, &recipient, &net);
+
             error_recovery::record_success(&env);
             threshold_monitor::record_operation_success(&env);
-            threshold_monitor::record_outflow(&env, amount);
+            threshold_monitor::record_outflow(&env, gross);
 
-            // Record success for circuit breaker and threshold monitor
-            error_recovery::record_success(&env);
-            threshold_monitor::record_operation_success(&env);
-            threshold_monitor::record_outflow(&env, amount);
-
-            // Record payout
             let payout_record = PayoutRecord {
                 recipient,
-                amount,
+                amount: net,
                 timestamp,
             };
             updated_history.push_back(payout_record);
@@ -1870,48 +2005,66 @@ impl ProgramEscrowContract {
             }
         }
 
-        // Transfer funds from contract to recipient
         let contract_address = env.current_contract_address();
         let token_client = token::Client::new(&env, &program_data.token_address);
-        token_client.transfer(&contract_address, &recipient, &amount);
+        let cfg = Self::get_fee_config_internal(&env);
+        let pay_fee = Self::combined_fee_amount(
+            amount,
+            cfg.payout_fee_rate,
+            cfg.payout_fixed_fee,
+            cfg.fee_enabled,
+        );
+        let net = amount.checked_sub(pay_fee).unwrap_or(0);
+        if net <= 0 {
+            reentrancy_guard::clear_entered(&env);
+            panic!("Payout fee consumes entire payout");
+        }
 
-        // Record success for circuit breaker and threshold monitor
+        if pay_fee > 0 {
+            token_client.transfer(&contract_address, &cfg.fee_recipient, &pay_fee);
+            Self::emit_fee_collected(
+                &env,
+                symbol_short!("payout"),
+                pay_fee,
+                cfg.payout_fee_rate,
+                cfg.payout_fixed_fee,
+                cfg.fee_recipient.clone(),
+            );
+        }
+
+        token_client.transfer(&contract_address, &recipient, &net);
+
         error_recovery::record_success(&env);
         threshold_monitor::record_operation_success(&env);
         threshold_monitor::record_outflow(&env, amount);
 
-        // Record payout
         let timestamp = env.ledger().timestamp();
         let payout_record = PayoutRecord {
             recipient: recipient.clone(),
-            amount,
+            amount: net,
             timestamp,
         };
 
         let mut updated_history = program_data.payout_history.clone();
         updated_history.push_back(payout_record);
 
-        // Update program data
         let mut updated_data = program_data.clone();
         updated_data.remaining_balance -= amount;
         updated_data.payout_history = updated_history;
 
-        // Store updated data
         env.storage().instance().set(&PROGRAM_DATA, &updated_data);
 
-        // Emit Payout event
         env.events().publish(
             (PAYOUT,),
             PayoutEvent {
                 version: EVENT_VERSION_V2,
                 program_id: updated_data.program_id.clone(),
-                recipient,
-                amount,
+                recipient: recipient.clone(),
+                amount: net,
                 remaining_balance: updated_data.remaining_balance,
             },
         );
 
-        // Clear reentrancy guard before returning
         reentrancy_guard::clear_entered(&env);
 
         updated_data
@@ -2003,7 +2156,7 @@ impl ProgramEscrowContract {
                 version: EVENT_VERSION_V2,
                 program_id: program_data.program_id,
                 schedule_id,
-                recipient,
+                recipient: recipient.clone(),
                 amount,
                 release_timestamp,
             },
@@ -2160,6 +2313,16 @@ impl ProgramEscrowContract {
         program_id: String,
         beneficiaries: Vec<BeneficiarySplit>,
     ) -> SplitConfig {
+        if let Some(admin) = env.storage().instance().get::<_, Address>(&DataKey::Admin) {
+            admin.require_auth();
+        } else {
+            let program: ProgramData = env
+                .storage()
+                .instance()
+                .get(&PROGRAM_DATA)
+                .unwrap_or_else(|| panic!("Program not initialized"));
+            program.authorized_payout_key.require_auth();
+        }
         payout_splits::set_split_config(&env, &program_id, beneficiaries)
     }
 
@@ -2168,6 +2331,16 @@ impl ProgramEscrowContract {
     }
 
     pub fn disable_split_config(env: Env, program_id: String) {
+        if let Some(admin) = env.storage().instance().get::<_, Address>(&DataKey::Admin) {
+            admin.require_auth();
+        } else {
+            let program: ProgramData = env
+                .storage()
+                .instance()
+                .get(&PROGRAM_DATA)
+                .unwrap_or_else(|| panic!("Program not initialized"));
+            program.authorized_payout_key.require_auth();
+        }
         payout_splits::disable_split_config(&env, &program_id);
     }
 
@@ -2176,6 +2349,12 @@ impl ProgramEscrowContract {
         program_id: String,
         total_amount: i128,
     ) -> payout_splits::SplitPayoutResult {
+        let program: ProgramData = env
+            .storage()
+            .instance()
+            .get(&PROGRAM_DATA)
+            .unwrap_or_else(|| panic!("Program not initialized"));
+        program.authorized_payout_key.require_auth();
         payout_splits::execute_split_payout(&env, &program_id, total_amount)
     }
 
@@ -2678,6 +2857,10 @@ impl ProgramEscrowContract {
         }
     }
 
+    /// Reserve funds for a recipient-controlled claim.
+    ///
+    /// This is treated as part of the release path because it authorizes
+    /// a payout claim against escrowed program funds.
     pub fn create_pending_claim(
         env: Env,
         program_id: String,
@@ -2685,31 +2868,48 @@ impl ProgramEscrowContract {
         amount: i128,
         claim_deadline: u64,
     ) -> u64 {
+        if Self::check_paused(&env, symbol_short!("release")) {
+            panic!("Funds Paused");
+        }
         claim_period::create_pending_claim(&env, &program_id, &recipient, amount, claim_deadline)
     }
 
+    /// Execute a previously approved claim and transfer its reserved funds.
+    ///
+    /// Claims are part of the release path, so `release_paused` blocks them.
     pub fn execute_claim(env: Env, program_id: String, claim_id: u64, recipient: Address) {
+        if Self::check_paused(&env, symbol_short!("release")) {
+            panic!("Funds Paused");
+        }
         claim_period::execute_claim(&env, &program_id, claim_id, &recipient)
     }
 
+    /// Cancel a pending claim and return its reserved amount to escrow.
+    ///
+    /// Claim cancellation is a refund-path operation, so `refund_paused`
+    /// blocks it independently of lock and release operations.
     pub fn cancel_claim(env: Env, program_id: String, claim_id: u64, admin: Address) {
+        if Self::check_paused(&env, symbol_short!("refund")) {
+            panic!("Funds Paused");
+        }
         claim_period::cancel_claim(&env, &program_id, claim_id, &admin)
     }
 
+    /// Retrieve a stored claim record by program and claim id.
     pub fn get_claim(env: Env, program_id: String, claim_id: u64) -> claim_period::ClaimRecord {
         claim_period::get_claim(&env, &program_id, claim_id)
     }
 
+    /// Set the default claim window used by off-chain workflows.
     pub fn set_claim_window(env: Env, admin: Address, window_seconds: u64) {
         claim_period::set_claim_window(&env, &admin, window_seconds)
     }
 
+    /// Return the configured default claim window duration in seconds.
     pub fn get_claim_window(env: Env) -> u64 {
         claim_period::get_claim_window(&env)
     }
 
-    // ========================================================================
-    // Dispute Resolution
     // ========================================================================
     // Dispute Resolution
     // ========================================================================

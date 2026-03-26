@@ -15,6 +15,27 @@ A Soroban smart contract for managing program-level escrow funds for hackathons 
 - **Payout History**: Maintains a complete history of all payouts
 - **Dispute Resolution**: Admin-controlled dispute lifecycle that blocks payouts while a dispute is open
 
+## Granular Pause Matrix
+
+Pause flags are operation-specific rather than global:
+
+| Operation | Pause flag |
+|---|---|
+| `lock_program_funds` | `lock_paused` |
+| `single_payout` | `release_paused` |
+| `batch_payout` | `release_paused` |
+| `trigger_program_releases` | `release_paused` |
+| `create_pending_claim` | `release_paused` |
+| `execute_claim` | `release_paused` |
+| `cancel_claim` | `refund_paused` |
+| read-only queries | unaffected |
+
+Claim semantics follow the same split used in `bounty_escrow`:
+
+- creating or executing a claim is a release-path action and is blocked only by `release_paused`
+- cancelling a pending claim is a refund-path action and is blocked only by `refund_paused`
+- claims remain executable when only `lock_paused` is set, so existing approved payouts are not trapped during deposit-only incidents
+
 ## Dispute Lifecycle
 
 A dispute can be raised by the contract admin to freeze all payout operations pending investigation.

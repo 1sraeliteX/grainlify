@@ -55,6 +55,28 @@ limits and guidance.
 
 ---
 
+## Risk flags (bounty metadata)
+
+Per-bounty risk signaling uses a `u32` bitfield on escrow metadata (`RISK_FLAG_*` constants in `lib.rs`). Admin-only entrypoints `set_escrow_risk_flags` and `clear_escrow_risk_flags` persist flags and emit `RiskFlagsUpdated` (versioned payload with `previous_flags`, `new_flags`, `admin`, `timestamp`) for indexers. Flags are informational on-chain; policy enforcement is expected off-chain. Tests: `contracts/escrow/src/test_risk_flags.rs`.
+
+## Boundary limits
+
+| Area | Behavior |
+|------|----------|
+| Amount policy | Optional inclusive `[min_amount, max_amount]` via `set_amount_policy`; violations return `AmountBelowMinimum` / `AmountAboveMaximum`. `min > max` panics. |
+| Fees | Rates are in basis points; cap is `MAX_FEE_RATE` (5000 = 50%). |
+| Batch size | `MAX_BATCH_SIZE` (20) items per `batch_lock_funds` / `batch_release_funds`. |
+| Deadlines | `u64::MAX` is stored as-is (no-expiry style); past deadlines are allowed at lock time. |
+| Pagination | `get_escrow_ids_by_status` with `limit == 0` returns an empty list. |
+
+Tests: `contracts/escrow/src/test_boundary_edge_cases.rs` (and `test_batch_failure_modes.rs` for batch edges).
+
+## Status transitions and expiry vs dispute
+
+Valid payout paths are mutually exclusive: admin `release_funds` moves escrow to `Released`; refund moves to `Refunded` / `PartiallyRefunded`. A second release or refund on a terminal state fails with `FundsNotLocked` (or related errors). When a pending claim exists (`authorize_claim`), `refund` returns `ClaimPending` even if the bounty deadline has passed—admin must `cancel_pending_claim` (or the beneficiary `claim`s) before expiry-based refund applies. Tests: `contracts/escrow/src/test_lifecycle.rs`, `test_expiration_and_dispute.rs`, `test_status_transitions.rs`.
+
+---
+
 # Soroban Project
 
 ## Project Structure
