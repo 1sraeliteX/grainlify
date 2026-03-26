@@ -5064,6 +5064,9 @@ mod test_front_running_ordering;
 mod test_granular_pause;
 #[cfg(test)]
 mod test_invariants;
+#[cfg(test)]
+mod test_compatibility;
+#[cfg(test)]
 mod test_lifecycle;
 #[cfg(test)]
 mod test_metadata_tagging;
