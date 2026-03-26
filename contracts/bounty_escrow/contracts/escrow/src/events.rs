@@ -235,6 +235,8 @@ pub struct FeeCollected {
     pub operation_type: FeeOperationType, // determines if the fee was collected on lock or release.
     pub amount: i128,                     // actual fee amount transferred
     pub fee_rate: i128,                   // fee rate applied in basis points (1 bp = 0.01 %).
+    /// Fixed fee component (token smallest units) applied in addition to percentage.
+    pub fee_fixed: i128,
     pub recipient: Address,
     pub timestamp: u64, // Ledger timestamp.
 }
@@ -291,6 +293,10 @@ pub struct FeeConfigUpdated {
     pub lock_fee_rate: i128,
     /// New release fee rate in basis points.
     pub release_fee_rate: i128,
+    /// Flat fee added on each lock (token smallest units).
+    pub lock_fixed_fee: i128,
+    /// Flat fee added on each release (token smallest units).
+    pub release_fixed_fee: i128,
     /// Address designated to receive fees.
     pub fee_recipient: Address,
     /// Whether fee collection is active after this update.

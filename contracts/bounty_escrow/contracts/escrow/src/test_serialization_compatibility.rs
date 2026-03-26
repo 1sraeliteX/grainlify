@@ -52,7 +52,6 @@ where
 // 2) Regenerate `serialization_goldens.rs` from the printed EXPECTED block.
 
 #[test]
-#[ignore = "Regenerate serialization_goldens.rs after fee schema change — see contracts/FEE_MECHANISM.md"]
 fn serialization_compatibility_public_types_and_events() {
     let env = Env::default();
 

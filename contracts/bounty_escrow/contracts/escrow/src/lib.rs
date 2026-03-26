@@ -1285,79 +1285,60 @@ impl BountyEscrowContract {
     }
 
     /// Routes a collected fee to either the default recipient or configured treasury splits.
-    fn route_fee(
-        env: &Env,
-        client: &token::Client,
-        config: &FeeConfig,
-        fee_amount: i128,
-        fee_rate: i128,
-        operation_type: events::FeeOperationType,
-    ) -> Result<(), Error> {
-        if fee_amount <= 0 {
-            return Ok(());
+    ///
+    /// Accepts a pre-constructed [`FeeCollected`] event which contains all fee details.
+    /// The token client and fee config are resolved internally from contract storage.
+    fn route_fee(env: &Env, fee_event: events::FeeCollected) {
+        if fee_event.amount <= 0 {
+            return;
         }
+
+        let token_addr: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        let client = token::Client::new(env, &token_addr);
+        let config = Self::get_fee_config_internal(env);
 
         if !config.distribution_enabled || config.treasury_destinations.is_empty() {
             client.transfer(
                 &env.current_contract_address(),
-                &config.fee_recipient,
-                &fee_amount,
+                &fee_event.recipient,
+                &fee_event.amount,
             );
-            events::emit_fee_collected(
-                env,
-                events::FeeCollected {
-                    operation_type,
-                    amount: fee_amount,
-                    fee_rate,
-                    recipient: config.fee_recipient.clone(),
-                    timestamp: env.ledger().timestamp(),
-                },
-            );
-            return Ok(());
+            events::emit_fee_collected(env, fee_event);
+            return;
         }
 
         let mut total_weight: u64 = 0;
         for destination in config.treasury_destinations.iter() {
             total_weight = total_weight
                 .checked_add(destination.weight as u64)
-                .ok_or(Error::InvalidAmount)?;
+                .unwrap_or(u64::MAX);
         }
 
         if total_weight == 0 {
             client.transfer(
                 &env.current_contract_address(),
-                &config.fee_recipient,
-                &fee_amount,
+                &fee_event.recipient,
+                &fee_event.amount,
             );
-            events::emit_fee_collected(
-                env,
-                events::FeeCollected {
-                    operation_type,
-                    amount: fee_amount,
-                    fee_rate,
-                    recipient: config.fee_recipient.clone(),
-                    timestamp: env.ledger().timestamp(),
-                },
-            );
-            return Ok(());
+            events::emit_fee_collected(env, fee_event);
+            return;
         }
 
         let mut distributed = 0i128;
         let destination_count = config.treasury_destinations.len() as usize;
+        let fee_amount = fee_event.amount;
 
         for (index, destination) in config.treasury_destinations.iter().enumerate() {
             let share = if index + 1 == destination_count {
-                fee_amount.checked_sub(distributed).ok_or(Error::InvalidAmount)?
+                fee_amount.checked_sub(distributed).unwrap_or(0)
             } else {
                 fee_amount
                     .checked_mul(destination.weight as i128)
                     .and_then(|value| value.checked_div(total_weight as i128))
-                    .ok_or(Error::InvalidAmount)?
+                    .unwrap_or(0)
             };
 
-            distributed = distributed
-                .checked_add(share)
-                .ok_or(Error::InvalidAmount)?;
+            distributed = distributed.checked_add(share).unwrap_or(distributed);
 
             if share <= 0 {
                 continue;
@@ -1367,16 +1348,15 @@ impl BountyEscrowContract {
             events::emit_fee_collected(
                 env,
                 events::FeeCollected {
-                    operation_type: operation_type.clone(),
+                    operation_type: fee_event.operation_type.clone(),
                     amount: share,
-                    fee_rate,
+                    fee_rate: fee_event.fee_rate,
+                    fee_fixed: fee_event.fee_fixed,
                     recipient: destination.address,
                     timestamp: env.ledger().timestamp(),
                 },
             );
         }
-
-        Ok(())
     }
 
     /// Update fee configuration (admin only)
