@@ -663,8 +663,11 @@ pub struct Escrow {
 #[contracttype]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ParticipantFilterMode {
+    /// Disable participant filtering. Any depositor may lock funds.
     Disabled = 0,
+    /// Reject only addresses present in the blocklist.
     BlocklistOnly = 1,
+    /// Accept only addresses present in the allowlist.
     AllowlistOnly = 2,
 }
 
@@ -3975,6 +3978,9 @@ impl BountyEscrowContract {
         results
     }
 
+    /// Set the anti-abuse operator address.
+    ///
+    /// The stored contract admin must authorize this change.
     pub fn set_anti_abuse_admin(env: Env, admin: Address) -> Result<(), Error> {
         let current: Address = env
             .storage()
@@ -3986,12 +3992,17 @@ impl BountyEscrowContract {
         Ok(())
     }
 
+    /// Get the currently configured anti-abuse operator, if one has been set.
     pub fn get_anti_abuse_admin(env: Env) -> Option<Address> {
         anti_abuse::get_admin(&env)
     }
 
-    /// Set whitelist status for an address (admin only). Named to avoid SDK client method conflict.
-    /// In AllowlistOnly mode this determines who may participate; in other modes it only affects anti-abuse bypass.
+    /// Set allowlist status for an address.
+    ///
+    /// The stored contract admin must authorize this change. In
+    /// [`ParticipantFilterMode::AllowlistOnly`] this determines who may create
+    /// new escrows. In other modes, allowlisted addresses only bypass
+    /// anti-abuse cooldown and window checks.
     pub fn set_whitelist_entry(
         env: Env,
         whitelisted_address: Address,
@@ -4007,8 +4018,12 @@ impl BountyEscrowContract {
         Ok(())
     }
 
-    /// Set participant filter mode (admin only). Mutually exclusive: Disabled, BlocklistOnly, or AllowlistOnly.
-    /// Emits ParticipantFilterModeChanged. Transitioning modes does not clear list data; only the active mode is enforced.
+    /// Set the active participant filter mode.
+    ///
+    /// The stored contract admin must authorize this change. The contract emits
+    /// [`ParticipantFilterModeChanged`] on every update. Switching modes does not
+    /// clear allowlist or blocklist storage; only the active mode is enforced for
+    /// future `lock_funds` and `batch_lock_funds` calls.
     pub fn set_filter_mode(env: Env, new_mode: ParticipantFilterMode) -> Result<(), Error> {
         let admin: Address = env
             .storage()
@@ -4032,12 +4047,19 @@ impl BountyEscrowContract {
         Ok(())
     }
 
-    /// View: current participant filter mode (default Disabled).
+    /// Get the current participant filter mode.
+    ///
+    /// Returns [`ParticipantFilterMode::Disabled`] when no explicit mode has
+    /// been stored.
     pub fn get_filter_mode(env: Env) -> ParticipantFilterMode {
         Self::get_participant_filter_mode(&env)
     }
 
-    /// Set blocklist status for an address (admin only). Only enforced when mode is BlocklistOnly.
+    /// Set blocklist status for an address.
+    ///
+    /// The stored contract admin must authorize this change. Blocklist entries
+    /// are enforced only while [`ParticipantFilterMode::BlocklistOnly`] is
+    /// active.
     pub fn set_blocklist_entry(env: Env, address: Address, blocked: bool) -> Result<(), Error> {
         let admin: Address = env
             .storage()

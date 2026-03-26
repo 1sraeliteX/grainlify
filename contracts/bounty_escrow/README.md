@@ -47,6 +47,16 @@ The escrow contract provides read-only dry-run entrypoints for previewing operat
 
 All return `SimulationResult` with success/error_code/amount/resulting_status/remaining_amount. No authorization required.
 
+## Participant filters
+
+The bounty escrow contract supports mutually exclusive participant filtering for new locks:
+
+- `Disabled` lets any depositor lock funds.
+- `BlocklistOnly` rejects blocklisted depositors with `ParticipantBlocked`.
+- `AllowlistOnly` accepts only allowlisted depositors and rejects others with `ParticipantNotAllowed`.
+
+Mode changes emit `ParticipantFilterModeChanged`, and allowlist entries continue to bypass anti-abuse cooldown checks even when filtering is disabled. See [contracts/escrow/PARTICIPANT_FILTER.md](contracts/escrow/PARTICIPANT_FILTER.md) for the full behavior matrix and edge cases.
+
 ## Metadata Constraints
 
 The escrow metadata API enforces validation rules for human-readable tags like
