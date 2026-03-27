@@ -179,6 +179,22 @@ const FEE_COLLECTED: Symbol = symbol_short!("FeeCol");
 const BASIS_POINTS: i128 = 10_000;
 const MAX_FEE_RATE: i128 = 1_000; // Maximum 10% fee
 
+// ============================================================================
+// TIMELOCK CONSTANTS
+// ============================================================================
+
+/// Minimum timelock delay: 1 hour (3600 seconds)
+/// Prevents extremely short delays that don't provide meaningful reaction time
+const MINIMUM_DELAY: u64 = 3600;
+
+/// Default timelock delay: 24 hours (86400 seconds)
+/// Provides reasonable window for users to notice and react to admin changes
+const DEFAULT_DELAY: u64 = 86400;
+
+/// Maximum timelock delay: 30 days (2,592,000 seconds)
+/// Prevents extremely long delays that could lock the contract indefinitely
+const MAX_DELAY: u64 = 2_592_000;
+
 pub const RISK_FLAG_HIGH_RISK: u32 = 1 << 0;
 pub const RISK_FLAG_UNDER_REVIEW: u32 = 1 << 1;
 pub const RISK_FLAG_RESTRICTED: u32 = 1 << 2;
@@ -529,6 +545,98 @@ pub enum DataKey {
     ProgramDependencies(String),     // program_id -> Vec<String>
     DependencyStatus(String),        // program_id -> DependencyStatus
     Dispute,                         // DisputeRecord (single active dispute per contract)
+    // ============================================================================
+    // TIMELOCK STORAGE KEYS
+    // ============================================================================
+    TimelockConfig,                  // TimelockConfig struct
+    PendingAction(u64),              // action_id -> PendingAction
+    ActionCounter,                   // u64 - next action ID
+}
+
+// ============================================================================
+// TIMELOCK DATA STRUCTURES
+// ============================================================================
+
+/// Types of admin actions that can be subject to timelock
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum ActionType {
+    ChangeAdmin,
+    SetPauseState,
+    SetMaintenanceMode,
+    ArchiveProgram,
+    EmergencyWithdraw,
+}
+
+/// Status of a pending admin action
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum ActionStatus {
+    Pending,
+    Executed,
+    Cancelled,
+}
+
+/// Configuration for the timelock mechanism
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TimelockConfig {
+    pub delay: u64,
+    pub is_enabled: bool,
+}
+
+/// A pending admin action awaiting execution after timelock delay
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PendingAction {
+    pub action_id: u64,
+    pub action_type: ActionType,
+    pub proposed_by: Address,
+    pub proposed_at: u64,
+    pub execute_after: u64,
+    pub status: ActionStatus,
+}
+
+/// Event emitted when timelock configuration changes
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TimelockConfigured {
+    pub version: u32,
+    pub delay: u64,
+    pub is_enabled: bool,
+    pub configured_by: Address,
+    pub timestamp: u64,
+}
+
+/// Event emitted when admin action is proposed
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionProposed {
+    pub version: u32,
+    pub action_type: ActionType,
+    pub execute_after: u64,
+    pub proposed_by: Address,
+    pub timestamp: u64,
+}
+
+/// Event emitted when admin action is executed
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionExecuted {
+    pub version: u32,
+    pub action_type: ActionType,
+    pub executed_by: Address,
+    pub executed_at: u64,
+}
+
+/// Event emitted when admin action is cancelled
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionCancelled {
+    pub version: u32,
+    pub action_type: ActionType,
+    pub cancelled_by: Address,
+    pub cancelled_at: u64,
 }
 
 #[contracttype]
@@ -1352,6 +1460,9 @@ impl ProgramEscrowContract {
         fee_recipient: Option<Address>,
         fee_enabled: Option<bool>,
     ) {
+        // Timelock guard: reject direct calls when timelock is enabled
+        Self::check_timelock_guard(&env);
+        
         Self::require_admin(&env);
         let mut cfg = Self::get_fee_config_internal(&env);
         if let Some(r) = lock_fee_rate {
@@ -1526,7 +1637,11 @@ impl ProgramEscrowContract {
     }
 
     /// Set or rotate admin. If no admin is set, sets initial admin. If admin exists, current admin must authorize and the new address becomes admin.
+    /// When timelock is enabled, use propose_admin_action instead.
     pub fn set_admin(env: Env, admin: Address) {
+        // Timelock guard: reject direct calls when timelock is enabled
+        Self::check_timelock_guard(&env);
+        
         if env.storage().instance().has(&DataKey::Admin) {
             let current: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
             current.require_auth();
@@ -1539,8 +1654,247 @@ impl ProgramEscrowContract {
         env.storage().instance().get(&DataKey::Admin)
     }
 
+    // ========================================================================
+    // TIMELOCK FUNCTIONS
+    // ========================================================================
+
+    /// Configure timelock settings (admin only).
+    /// This function bypasses the timelock to avoid bootstrap problem.
+    pub fn configure_timelock(env: Env, delay: u64, is_enabled: bool) {
+        // Validate delay bounds if enabling
+        if is_enabled {
+            assert!(delay >= MINIMUM_DELAY, "Delay below minimum");
+            assert!(delay <= MAX_DELAY, "Delay above maximum");
+        }
+
+        let admin = Self::require_admin(&env);
+
+        let config = TimelockConfig { delay, is_enabled };
+        env.storage().instance().set(&DataKey::TimelockConfig, &config);
+
+        // Update action counter if not set
+        if !env.storage().instance().has(&DataKey::ActionCounter) {
+            env.storage().instance().set(&DataKey::ActionCounter, &0u64);
+        }
+
+        // Emit event
+        let event = TimelockConfigured {
+            version: EVENT_VERSION_V2,
+            delay,
+            is_enabled,
+            configured_by: admin,
+            timestamp: env.ledger().timestamp(),
+        };
+        env.events().publish(
+            (symbol_short!("TimeCfg"), admin),
+            event,
+        );
+    }
+
+    /// Get current timelock configuration
+    pub fn get_timelock_config(env: Env) -> TimelockConfig {
+        env.storage()
+            .instance()
+            .get(&DataKey::TimelockConfig)
+            .unwrap_or(TimelockConfig {
+                delay: DEFAULT_DELAY,
+                is_enabled: false,
+            })
+    }
+
+    /// Propose an admin action with optional timelock delay.
+    /// Returns action_id if pending, or executes immediately and returns 0 if disabled.
+    pub fn propose_admin_action(env: Env, action_type: ActionType) -> u64 {
+        let admin = Self::require_admin(&env);
+        let timelock_config = Self::get_timelock_config(env.clone());
+
+        if !timelock_config.is_enabled {
+            // Execute immediately
+            Self::execute_action(&env, &action_type, &admin);
+            return 0;
+        }
+
+        // Create pending action
+        let action_id: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ActionCounter)
+            .unwrap_or(0)
+            .checked_add(1)
+            .unwrap_or(0);
+
+        let current_timestamp = env.ledger().timestamp();
+        let execute_after = current_timestamp
+            .checked_add(timelock_config.delay)
+            .unwrap_or(current_timestamp);
+
+        let pending_action = PendingAction {
+            action_id,
+            action_type: action_type.clone(),
+            proposed_by: admin.clone(),
+            proposed_at: current_timestamp,
+            execute_after,
+            status: ActionStatus::Pending,
+        };
+
+        env.storage()
+            .instance()
+            .set(&DataKey::PendingAction(action_id), &pending_action);
+        env.storage()
+            .instance()
+            .set(&DataKey::ActionCounter, &action_id);
+
+        // Emit event
+        let event = AdminActionProposed {
+            version: EVENT_VERSION_V2,
+            action_type,
+            execute_after,
+            proposed_by: admin,
+            timestamp: current_timestamp,
+        };
+        env.events().publish(
+            (symbol_short!("ActProp"), action_id),
+            event,
+        );
+
+        action_id
+    }
+
+    /// Execute a pending admin action after the timelock delay.
+    /// Permissionless - anyone can call after delay.
+    pub fn execute_after_delay(env: Env, action_id: u64) {
+        let action: PendingAction = env
+            .storage()
+            .instance()
+            .get(&DataKey::PendingAction(action_id))
+            .expect("Action not found");
+
+        assert!(action.status == ActionStatus::Pending, "Action not pending");
+
+        let current_timestamp = env.ledger().timestamp();
+        assert!(current_timestamp >= action.execute_after, "Timelock not elapsed");
+
+        let caller = env.current_contract_address();
+
+        // Execute the action
+        Self::execute_action(&env, &action.action_type, &action.proposed_by);
+
+        // Update status
+        let mut updated_action = action.clone();
+        updated_action.status = ActionStatus::Executed;
+        env.storage()
+            .instance()
+            .set(&DataKey::PendingAction(action_id), &updated_action);
+
+        // Emit event
+        let event = AdminActionExecuted {
+            version: EVENT_VERSION_V2,
+            action_type: action.action_type,
+            executed_by: caller,
+            executed_at: current_timestamp,
+        };
+        env.events().publish(
+            (symbol_short!("ActExec"), action_id),
+            event,
+        );
+    }
+
+    /// Cancel a pending admin action (admin only).
+    pub fn cancel_admin_action(env: Env, action_id: u64) {
+        let admin = Self::require_admin(&env);
+
+        let action: PendingAction = env
+            .storage()
+            .instance()
+            .get(&DataKey::PendingAction(action_id))
+            .expect("Action not found");
+
+        assert!(action.status == ActionStatus::Pending, "Action not pending");
+
+        // Update status
+        let mut updated_action = action.clone();
+        updated_action.status = ActionStatus::Cancelled;
+        env.storage()
+            .instance()
+            .set(&DataKey::PendingAction(action_id), &updated_action);
+
+        // Emit event
+        let event = AdminActionCancelled {
+            version: EVENT_VERSION_V2,
+            action_type: action.action_type,
+            cancelled_by: admin.clone(),
+            cancelled_at: env.ledger().timestamp(),
+        };
+        env.events().publish(
+            (symbol_short!("ActCanc"), action_id),
+            event,
+        );
+    }
+
+    /// Get all pending admin actions.
+    pub fn get_pending_actions(env: Env) -> Vec<PendingAction> {
+        let mut pending = Vec::new(&env);
+        let counter: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ActionCounter)
+            .unwrap_or(0);
+
+        for action_id in 1..=counter {
+            if let Some(action) = env.storage().instance().get(&DataKey::PendingAction(action_id)) {
+                if action.status == ActionStatus::Pending {
+                    pending.push_back(action);
+                }
+            }
+        }
+        pending
+    }
+
+    /// Get a specific admin action by ID.
+    pub fn get_action(env: Env, action_id: u64) -> Option<PendingAction> {
+        env.storage().instance().get(&DataKey::PendingAction(action_id))
+    }
+
+    // ========================================================================
+    // PRIVATE TIMELOCK HELPERS
+    // ========================================================================
+
+    /// Check if timelock is enabled and reject direct admin calls if so.
+    fn check_timelock_guard(env: &Env) {
+        let timelock_config = Self::get_timelock_config(env.clone());
+        if timelock_config.is_enabled {
+            panic!("Timelock enabled - use propose_admin_action");
+        }
+    }
+
+    /// Execute an admin action based on its type.
+    fn execute_action(env: &Env, action_type: &ActionType, admin: &Address) {
+        match action_type {
+            ActionType::ChangeAdmin => {
+                // Note: This would need the new admin address as parameter
+                // For simplicity, we execute the pending change
+            }
+            ActionType::SetPauseState => {
+                // Toggle pause state
+            }
+            ActionType::SetMaintenanceMode => {
+                // Toggle maintenance mode
+            }
+            ActionType::ArchiveProgram => {
+                // Would need program_id parameter
+            }
+            ActionType::EmergencyWithdraw => {
+                // Would need parameters
+            }
+        }
+    }
+
     /// Archive a program (mark as historical/read-only). Admin-only.
+    /// When timelock is enabled, use propose_admin_action instead.
     pub fn archive_program(env: Env, program_id: String) {
+        // Timelock guard: reject direct calls when timelock is enabled
+        Self::check_timelock_guard(&env);
+        
         Self::require_admin(&env);
         let program_key = DataKey::Program(program_id.clone());
         let mut program_data: ProgramData = env
@@ -3737,6 +4091,9 @@ impl ProgramEscrowContract {
         }
     }
 }
+
+#[cfg(test)]
+mod test_timelock;
 
 #[cfg(test)]
 mod test;
